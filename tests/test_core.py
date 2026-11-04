@@ -7,7 +7,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 from shared.common import find_latest
-from shared.core import trial, work_status
+from shared.core import trial, work_status, prepare_live_rounds, finish_live_round
 from shared.updater import asset_details, check_url, verify
 
 class Tests(unittest.TestCase):
@@ -33,6 +33,19 @@ class Tests(unittest.TestCase):
                 self.assertEqual(r['won'], r['final'] == r['prize'])
             rate = sum(r['won'] for r in records) / len(records)
             self.assertAlmostEqual(rate, 2/3 if strategy == 'switch' else 1/3, delta=.025)
+
+    def test_live_rounds_are_precommitted_and_consistent(self):
+        rounds = prepare_live_rounds(20, random.Random(17))
+        self.assertEqual(len(rounds), 20)
+        for game in rounds:
+            self.assertNotIn(game['revealed'], (game['prize'], game['choice']))
+            for strategy in ('stay', 'switch'):
+                result = finish_live_round(game, strategy)
+                self.assertEqual(result['prize'], game['prize'])
+                self.assertEqual(result['won'], result['final'] == game['prize'])
+                self.assertEqual(result['final'] == game['choice'], strategy == 'stay')
+        for count in (0, 21):
+            with self.assertRaises(ValueError): prepare_live_rounds(count)
 
     def test_release_selection(self):
         def release(tag, **kw):

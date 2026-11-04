@@ -22,7 +22,7 @@ jobs:
       - run: python -m pip install pyinstaller==6.11.1
       - name: Build executable
         shell: pwsh
-        run: pyinstaller --noconfirm --clean --onefile --windowed --name "${{ matrix.app }}" --paths . --add-data "shared/locales;shared/locales" "apps/${{ matrix.app }}/main.py"
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "${{ matrix.app }}" --icon "assets/${{ matrix.app }}.ico" --paths . --add-data "shared/locales;shared/locales" --add-data "assets;assets" "apps/${{ matrix.app }}/main.py"
       - name: Package portable ZIP and checksums
         shell: pwsh
         run: ./packaging/package-windows.ps1 -App "${{ matrix.app }}" -Executable "dist/${{ matrix.app }}.exe" -OutputDirectory dist

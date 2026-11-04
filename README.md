@@ -2,8 +2,10 @@
 
 Two small desktop apps with shared cross-platform logic and seven language files. Windows is the initial supported distribution; Python and Tkinter keep the core portable, but macOS packaging and platform behavior are not yet implemented or tested.
 
-- **Work Motivator:** enter a same-day work schedule and nonnegative hourly wage. Time remaining displays milliseconds; the UI refreshes approximately every 25 ms, subject to OS scheduling. Earnings accrue from the scheduled start until the end, with no breaks, tax, overtime, or currency conversion; the entered wage determines the currency. Before the shift, earnings are zero and the countdown includes time until the end; after the shift, earnings are capped and the countdown is zero. Overnight shifts are not supported.
-- **Monty Hall:** simulate one or up to 100,000 trials using a chosen stay/switch strategy. Each trial randomly chooses the prize and initial door; the host opens a non-prize, unchosen door. The table previews 500 records and CSV export contains them all. Each run replaces the previous run. Email opens a draft in the user's configured mail application; the user reviews and sends it. Up to 10 records are included in the draft; for larger runs, export the CSV and attach it manually. A configured email application is required; this program does not send mail directly.
+- **Work Motivator:** configure a same-day schedule and hourly wage in Settings. The main view shows the shift status, millisecond countdown, estimated earnings, current rate, and progress. Monthly hours count only time observed while the app is running during scheduled hours; closed or sleeping time is not inferred. Earnings are schedule-based estimates and exclude breaks, taxes, and overtime. Overnight shifts are not supported.
+- **Three Doors Problem (Monty Hall Problem):** run an experiment of up to 100,000 trials with either strategy, or play 1–20 interactive rounds. Before a live game begins, choose a new text file to save all randomized prize and empty-door assignments. The player can inspect that file and compare the saved layout with each result. The initial selection is random; the host opens an empty door, and the player chooses to switch or stay. Email functionality has been removed.
+
+Both apps offer English, Simplified Chinese, Korean, Japanese, Thai, German, and Spanish, as well as light and dark themes. Their theme and language preferences are saved per app. Shared desktop requirements for future apps are documented in `.agents/skills/fishfish-desktop/SKILL.md`.
 
 ## Run from source
 

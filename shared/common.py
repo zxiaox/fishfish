@@ -79,3 +79,27 @@ def find_latest(releases, app_id, current=None):
     return max(candidates, default=None)
 
 
+
+
+def apply_theme(root, theme):
+    from tkinter import ttk
+    dark = theme == 'dark'
+    bg, fg, field = ('#20252d', '#f5f5f5', '#343b46') if dark else ('#f3f5f6', '#17212b', '#ffffff')
+    style = ttk.Style(root)
+    style.theme_use('clam')
+    root.configure(background=bg)
+    style.configure('.', background=bg, foreground=fg, fieldbackground=field)
+    style.configure('TFrame', background=bg)
+    style.configure('TLabel', background=bg, foreground=fg)
+    style.configure('TButton', background=field, foreground=fg)
+    style.map('TButton', background=[('active', '#637e89')])
+    style.configure('Treeview', background=field, fieldbackground=field, foreground=fg)
+    style.configure('Treeview.Heading', background=field, foreground=fg)
+    style.configure('Earnings.TLabel', background=bg, foreground='#42b86e' if dark else '#08782e', font=('', 22, 'bold'))
+
+
+def set_app_icon(root, app_id):
+    if sys.platform == 'win32':
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('zxiaox.fishfish.' + app_id)
+    root.iconphoto(True, __import__('tkinter').PhotoImage(file=str(resource_root() / 'assets' / (app_id + '.png'))))
