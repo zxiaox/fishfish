@@ -68,11 +68,11 @@ class Tests(unittest.TestCase):
     def test_locale_keys_and_placeholders(self):
         paths = sorted(Path('shared/locales').glob('*.json'))
         self.assertEqual(len(paths), 7)
-        english = json.loads(Path('shared/locales/en.json').read_text())
+        english = json.loads(Path('shared/locales/en.json').read_text(encoding='utf-8'))
         formatter = string.Formatter()
         fields = lambda s: {name for _, name, _, _ in formatter.parse(s) if name}
         for path in paths:
-            data = json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8"))
             self.assertEqual(set(data), set(english), path)
             for key in english: self.assertEqual(fields(data[key]), fields(english[key]), (path, key))
 
