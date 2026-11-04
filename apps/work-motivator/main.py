@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
 from tkinter import ttk
 from shared import dialogs as messagebox
-from shared.common import Translator, load_settings, save_settings, LANGUAGES, apply_theme, set_app_icon
+from shared.common import Translator, load_settings, save_settings, settings_menu, apply_theme, set_app_icon
 from shared.dialogs import center_window
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import work_status, work_interval, observed_work_by_day
@@ -30,7 +30,8 @@ class App:
         self.root.title(t('work_title')); self.root.geometry('560x380')
         top = ttk.Frame(self.root, padding=12); top.pack(fill='x')
         ttk.Label(top, text=t('work_title'), font=('', 16, 'bold')).pack(side='left')
-        ttk.Button(top, text=t('settings'), command=self.open_settings).pack(side='right')
+        settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
+                      lambda: check_updates(self.root, APP, self.tr), self.open_settings)
         ttk.Label(self.root, textvariable=self.status, font=('', 13, 'bold')).pack(pady=(12, 5))
         ttk.Label(self.root, textvariable=self.remaining, font=('', 15)).pack(pady=5)
         ttk.Label(self.root, textvariable=self.earned, style='Earnings.TLabel').pack(pady=8)
@@ -47,21 +48,20 @@ class App:
         for row, (label, var) in enumerate((('start_time', start), ('end_time', end), ('hourly_wage', wage))):
             ttk.Label(form, text=t(label)).grid(row=row, column=0, sticky='w', pady=6)
             ttk.Entry(form, textvariable=var, width=20).grid(row=row, column=1, sticky='ew', padx=12)
-        ttk.Label(form, text=t('language')).grid(row=3, column=0, sticky='w')
-        language = ttk.Combobox(form, values=list(LANGUAGES), state='readonly', width=18)
-        langs = LANGUAGES
-        language.set(next(k for k,v in langs.items() if v == self.tr.code)); language.grid(row=3,column=1,pady=6)
-        ttk.Label(form, text=t('theme')).grid(row=4,column=0,sticky='w')
-        theme = ttk.Combobox(form, values=[t('light'), t('dark')], state='readonly', width=18); theme.current(1 if self.theme=='dark' else 0); theme.grid(row=4,column=1,pady=6)
         def confirm():
             try: work_status(datetime.now(), start.get(), end.get(), wage.get())
             except (ValueError, ArithmeticError): messagebox.showerror(t('error'), t('work_error'), parent=dialog); return
             self.start, self.end, self.wage = start.get(), end.get(), wage.get()
-            self.tr = Translator(langs[language.get()]); self.theme = 'dark' if theme.current()==1 else 'light'; self.settings['configured'] = True
+            self.settings['configured'] = True
             self.last_wall = datetime.now(); self.last_mono = time.monotonic(); self.save(); dialog.destroy(); self.build()
-        ttk.Button(form, text=t('confirm'), command=confirm).grid(row=5,column=1,pady=10)
-        ttk.Button(form, text=t('check_updates'), command=lambda: check_updates(self.root, APP, self.tr)).grid(row=6,columnspan=2,pady=4)
+        ttk.Button(form, text=t('confirm'), command=confirm).grid(row=3,column=1,pady=10)
         center_window(dialog, self.root)
+
+    def set_language(self, code):
+        self.tr = Translator(code); self.save(); self.build()
+
+    def set_theme(self, theme):
+        self.theme = theme; self.save(); self.build()
 
     def tick(self):
         now = datetime.now(); mono = time.monotonic()

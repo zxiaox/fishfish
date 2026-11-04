@@ -1,6 +1,7 @@
 import json
 import hashlib
 import struct
+import tempfile
 import random
 import string
 import unittest
@@ -9,6 +10,7 @@ from pathlib import Path
 from shared.common import find_latest
 from shared.core import trial, work_status, work_interval, observed_work_by_day, prepare_live_rounds, finish_live_round
 from shared.updater import asset_details, check_url, verify
+from shared.history import load_history, save_history, add_experiment
 
 class Tests(unittest.TestCase):
     def test_work_bounds_and_precision(self):
@@ -61,6 +63,23 @@ class Tests(unittest.TestCase):
                 self.assertEqual(result['final'] == game['choice'], strategy == 'stay')
         for count in (0, 21):
             with self.assertRaises(ValueError): prepare_live_rounds(count)
+
+    def test_history_persists_and_limits_experiments(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'history.json'
+            history = load_history(path)
+            for index in range(55):
+                add_experiment(history, {'date': str(index), 'strategy': 'switch', 'trials': 2, 'wins': 1, 'losses': 1})
+            live = {'date': '2026-11-04', 'record_path': 'layout.txt', 'rounds': [finish_live_round(prepare_live_rounds(1, random.Random(3))[0], 'stay')]}
+            history['live_sessions'].append(live)
+            save_history(path, history)
+            restored = load_history(path)
+            self.assertEqual(len(restored['experiments']), 50)
+            self.assertEqual(restored['experiments'][0]['date'], '5')
+            self.assertEqual(restored['live_sessions'], [live])
+            path.write_text('{bad json', encoding='utf-8')
+            with self.assertRaises(ValueError): load_history(path)
+            self.assertEqual(path.read_text(encoding='utf-8'), '{bad json')
 
     def test_release_selection(self):
         def release(tag, **kw):

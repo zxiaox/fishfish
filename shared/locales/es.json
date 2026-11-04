@@ -62,5 +62,13 @@
   "file_exists": "Elige otro nombre; no se sobrescriben archivos existentes.",
   "record_saved": "La distribución de puertas se guardó antes de jugar en:\n{path}\nPuedes abrir el archivo para comprobarla.",
   "round_prompt": "Ronda {number}/{total}: Se eligió al azar la puerta {choice}. El presentador abrió la puerta vacía {revealed}. ¿Cambiar o mantener?",
-  "round_result": "Ronda {number}: Premio tras la puerta {prize}; elección final {final}. ¡{result}! Victorias: {wins}/{total}."
+  "round_result": "Ronda {number}: Premio tras la puerta {prize}; elección final {final}. ¡{result}! Victorias: {wins}/{total}.",
+  "work_config": "Horario y salario",
+  "experiment_history": "Historial de experimentos (últimos 50)",
+  "live_history": "Historial de partidas",
+  "date": "Fecha y hora",
+  "wins": "Victorias",
+  "losses": "Derrotas",
+  "win_rate": "Porcentaje de victorias",
+  "history_error": "No se pudo leer o guardar el historial. El archivo existente se ha conservado. Detalles: {error}"
 }

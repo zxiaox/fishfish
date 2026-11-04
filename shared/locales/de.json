@@ -62,5 +62,13 @@
   "file_exists": "Neuen Dateinamen wählen; vorhandene Dateien werden nicht überschrieben.",
   "record_saved": "Die Türbelegung wurde vor Spielbeginn gespeichert:\n{path}\nDie Datei kann zur Kontrolle geöffnet werden.",
   "round_prompt": "Runde {number}/{total}: Zufällig wurde Tür {choice} gewählt. Der Moderator öffnete die leere Tür {revealed}. Wechseln oder bleiben?",
-  "round_result": "Runde {number}: Preis hinter Tür {prize}; endgültige Wahl {final}. {result}! Siege: {wins}/{total}."
+  "round_result": "Runde {number}: Preis hinter Tür {prize}; endgültige Wahl {final}. {result}! Siege: {wins}/{total}.",
+  "work_config": "Arbeitszeit und Stundenlohn",
+  "experiment_history": "Experimentverlauf (letzte 50)",
+  "live_history": "Live-Spielverlauf",
+  "date": "Datum und Uhrzeit",
+  "wins": "Siege",
+  "losses": "Niederlagen",
+  "win_rate": "Gewinnrate",
+  "history_error": "Der Verlauf konnte nicht gelesen oder gespeichert werden. Die vorhandene Datei bleibt erhalten. Details: {error}"
 }

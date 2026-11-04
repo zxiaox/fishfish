@@ -62,5 +62,13 @@
   "file_exists": "请选择新的文件名，不会覆盖已有文件。",
   "record_saved": "门的位置已在游戏开始前保存到：\n{path}\n您可以打开文件核对。",
   "round_prompt": "第 {number}/{total} 回合：您随机选中了 {choice} 号门。主持人打开了空的 {revealed} 号门。换门还是保持？",
-  "round_result": "第 {number} 回合：奖品在 {prize} 号门，您最终选择了 {final} 号门。{result}！胜场：{wins}/{total}。"
+  "round_result": "第 {number} 回合：奖品在 {prize} 号门，您最终选择了 {final} 号门。{result}！胜场：{wins}/{total}。",
+  "work_config": "工作时间与时薪",
+  "experiment_history": "实验历史（最近50条）",
+  "live_history": "实时游戏历史",
+  "date": "日期和时间",
+  "wins": "获胜",
+  "losses": "失败",
+  "win_rate": "胜率",
+  "history_error": "无法读取或保存历史记录，现有文件已保留。详情：{error}"
 }

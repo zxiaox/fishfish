@@ -62,5 +62,13 @@
   "file_exists": "新しいファイル名を選択してください。既存のファイルは上書きしません。",
   "record_saved": "開始前にドアの配置を保存しました:\n{path}\nファイルを開いて確認できます。",
   "round_prompt": "ラウンド {number}/{total}: ランダムにドア {choice} が選ばれました。司会者は空のドア {revealed} を開きました。変更しますか？",
-  "round_result": "ラウンド {number}: 賞品はドア {prize}、最終選択は {final}。{result}！勝利: {wins}/{total}。"
+  "round_result": "ラウンド {number}: 賞品はドア {prize}、最終選択は {final}。{result}！勝利: {wins}/{total}。",
+  "work_config": "勤務時間と時給",
+  "experiment_history": "実験履歴（最新50件）",
+  "live_history": "ライブゲーム履歴",
+  "date": "日時",
+  "wins": "勝ち",
+  "losses": "負け",
+  "win_rate": "勝率",
+  "history_error": "履歴の読み込みまたは保存に失敗しました。既存ファイルは保持されています。詳細: {error}"
 }

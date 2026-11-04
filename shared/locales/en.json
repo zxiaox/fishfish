@@ -62,5 +62,13 @@
   "file_exists": "Choose a new file name; existing files are not overwritten.",
   "record_saved": "Door layouts were saved before play to:\n{path}\nYou may open the file to check them.",
   "round_prompt": "Round {number} of {total}: Your randomly selected door is {choice}. The host opened empty door {revealed}. Switch or stay?",
-  "round_result": "Round {number}: Prize behind door {prize}; your final choice was {final}. {result}! Wins: {wins}/{total}."
+  "round_result": "Round {number}: Prize behind door {prize}; your final choice was {final}. {result}! Wins: {wins}/{total}.",
+  "work_config": "Work schedule and wage",
+  "experiment_history": "Experiment history (last 50)",
+  "live_history": "Live game history",
+  "date": "Date and time",
+  "wins": "Wins",
+  "losses": "Losses",
+  "win_rate": "Win rate",
+  "history_error": "History could not be read or saved. The existing file has been preserved. Details: {error}"
 }

@@ -7,7 +7,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-VERSIONS = {'work-motivator': '1.0.2', 'monty-hall': '1.0.2'}
+VERSIONS = {'work-motivator': '1.0.3', 'monty-hall': '1.0.3'}
 LANGUAGES = {'English': 'en', '简体中文': 'zh', '한국어': 'ko', '日本語': 'ja', 'ไทย': 'th', 'Deutsch': 'de', 'Español': 'es'}
 REPO = 'zxiaox/fishfish'
 
@@ -104,3 +104,28 @@ def set_app_icon(root, app_id):
         import ctypes
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('zxiaox.fishfish.' + app_id)
     root.iconphoto(True, __import__('tkinter').PhotoImage(file=str(resource_root() / 'assets' / (app_id + '.png'))))
+
+
+def settings_menu(root, tr, current_theme, set_language, set_theme, check_update, app_settings=None):
+    """Install a native top-left Settings menu shared by every app."""
+    import tkinter as tk
+    menubar = tk.Menu(root)
+    menu = tk.Menu(menubar, tearoff=False)
+    if app_settings:
+        menu.add_command(label=tr('work_config'), command=app_settings)
+        menu.add_separator()
+    languages = tk.Menu(menu, tearoff=False)
+    for name, code in LANGUAGES.items():
+        languages.add_command(label=('✓ ' if code == tr.code else '') + name,
+                              command=lambda code=code: set_language(code))
+    menu.add_cascade(label=tr('language'), menu=languages)
+    themes = tk.Menu(menu, tearoff=False)
+    for key in ('light', 'dark'):
+        themes.add_command(label=('✓ ' if key == current_theme else '') + tr(key),
+                           command=lambda key=key: set_theme(key))
+    menu.add_cascade(label=tr('theme'), menu=themes)
+    menu.add_separator()
+    menu.add_command(label=tr('check_updates'), command=check_update)
+    menubar.add_cascade(label=tr('settings'), menu=menu)
+    root.config(menu=menubar)
+    return menubar
