@@ -51,7 +51,7 @@ class Tests(unittest.TestCase):
         def release(tag, **kw):
             return {'tag_name': tag, 'html_url': 'https://github.com/zxiaox/fishfish/releases/tag/' + tag, **kw}
         releases = [release('work-motivator-v1.2.0'), release('monty-hall-v9.0.0'), release('work-motivator-v1.10.0'), release('work-motivator-v2.0.0', prerelease=True)]
-        self.assertEqual(find_latest(releases, 'work-motivator')[0], (1,10,0))
+        self.assertEqual(find_latest(releases, 'work-motivator', '1.0.0')[0], (1,10,0))
         self.assertIsNone(find_latest(releases, 'work-motivator', '1.10.0'))
         bad = release('work-motivator-v3.0.0'); bad['html_url'] = 'https://evil.example/'
         self.assertIsNone(find_latest([bad], 'work-motivator'))

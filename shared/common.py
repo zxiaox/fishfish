@@ -7,7 +7,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-VERSIONS = {'work-motivator': '1.0.0', 'monty-hall': '1.0.0'}
+VERSIONS = {'work-motivator': '1.0.1', 'monty-hall': '1.0.1'}
 LANGUAGES = {'English': 'en', '简体中文': 'zh', '한국어': 'ko', '日本語': 'ja', 'ไทย': 'th', 'Deutsch': 'de', 'Español': 'es'}
 REPO = 'zxiaox/fishfish'
 
