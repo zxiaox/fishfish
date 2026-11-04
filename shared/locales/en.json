@@ -6,7 +6,7 @@
   "hourly_wage": "Hourly wage",
   "remaining": "Time remaining: {time}",
   "earned": "Estimated earnings: {amount}",
-  "work_error": "Enter valid times (same-day, end after start) and a nonnegative hourly wage.",
+  "work_error": "Enter valid, different start and end times and a nonnegative hourly wage. An earlier end time means the next day.",
   "check_updates": "Check for updates",
   "updates": "Updates",
   "update_available": "Version {version} is available. Open its release page?",

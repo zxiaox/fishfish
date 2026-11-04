@@ -13,22 +13,63 @@ def parse_time(value):
     raise ValueError('time')
 
 
-def work_status(now, start, end, wage):
+def work_interval(now, start, end):
     start, end = parse_time(start), parse_time(end)
+    if start == end:
+        raise ValueError('schedule')
+    begin = datetime.combine(now.date(), start)
+    finish = datetime.combine(now.date(), end)
+    if end < start:
+        finish += timedelta(days=1)
+        if now.time() <= end:
+            begin -= timedelta(days=1)
+            finish -= timedelta(days=1)
+    return begin, finish
+
+
+def work_status(now, start, end, wage):
+    begin, finish = work_interval(now, start, end)
     try:
         wage = Decimal(wage)
         if not wage.is_finite() or wage < 0:
             raise ValueError('wage')
     except (InvalidOperation, TypeError):
         raise ValueError('wage')
-    begin = datetime.combine(now.date(), start)
-    finish = datetime.combine(now.date(), end)
-    if finish <= begin:
-        raise ValueError('schedule')
     total = (finish - begin).total_seconds()
     elapsed = max(0, min(total, (now - begin).total_seconds()))
     remaining = max(0, (finish - now).total_seconds())
     return remaining, Decimal(str(elapsed)) * wage / Decimal(3600), elapsed / total
+
+
+def observed_work_by_day(previous, now, start, end, monotonic_elapsed):
+    """Allocate observed work to calendar dates, including midnight boundaries."""
+    if now <= previous or monotonic_elapsed <= 0:
+        return {}
+    wall_elapsed = (now - previous).total_seconds()
+    # Never infer unobserved time while the system sleeps or the app is stalled.
+    observed = min(monotonic_elapsed, wall_elapsed, 2.0)
+    previous = max(previous, now - timedelta(seconds=observed))
+    allocations = {}
+    cursor = previous
+    while cursor < now:
+        boundary = datetime.combine(cursor.date() + timedelta(days=1), datetime.min.time())
+        segment_end = min(now, boundary)
+        # Consider shifts starting today and yesterday so a boundary inside a
+        # segment cannot hide either side of a shift ending at midnight.
+        seconds = 0.0
+        start_time, end_time = parse_time(start), parse_time(end)
+        if start_time == end_time:
+            raise ValueError('schedule')
+        for day in (cursor.date() - timedelta(days=1), cursor.date()):
+            begin = datetime.combine(day, start_time)
+            finish = datetime.combine(day, end_time)
+            if end_time < start_time:
+                finish += timedelta(days=1)
+            seconds += max(0.0, (min(segment_end, finish) - max(cursor, begin)).total_seconds())
+        if seconds:
+            allocations[cursor.date().isoformat()] = seconds
+        cursor = segment_end
+    return allocations
 
 
 def trial(strategy, rng=random):

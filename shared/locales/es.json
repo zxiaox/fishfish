@@ -6,7 +6,7 @@
   "hourly_wage": "Salario por hora",
   "remaining": "Tiempo restante: {time}",
   "earned": "Ingresos estimados: {amount}",
-  "work_error": "Introduce horas válidas del mismo día (fin posterior al inicio) y un salario no negativo.",
+  "work_error": "Introduce horas de inicio y fin válidas y diferentes, y un salario no negativo. Una hora de fin anterior corresponde al día siguiente.",
   "check_updates": "Buscar actualizaciones",
   "updates": "Actualizaciones",
   "update_available": "La versión {version} está disponible. ¿Abrir la página de lanzamiento?",

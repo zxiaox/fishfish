@@ -7,7 +7,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-VERSIONS = {'work-motivator': '1.0.1', 'monty-hall': '1.0.1'}
+VERSIONS = {'work-motivator': '1.0.2', 'monty-hall': '1.0.2'}
 LANGUAGES = {'English': 'en', '简体中文': 'zh', '한국어': 'ko', '日本語': 'ja', 'ไทย': 'th', 'Deutsch': 'de', 'Español': 'es'}
 REPO = 'zxiaox/fishfish'
 
@@ -95,6 +95,7 @@ def apply_theme(root, theme):
     style.map('TButton', background=[('active', '#637e89')])
     style.configure('Treeview', background=field, fieldbackground=field, foreground=fg)
     style.configure('Treeview.Heading', background=field, foreground=fg)
+    style.configure('Work.Horizontal.TProgressbar', background='#28a745', troughcolor=field, borderwidth=0, thickness=16)
     style.configure('Earnings.TLabel', background=bg, foreground='#42b86e' if dark else '#08782e', font=('', 22, 'bold'))
 
 

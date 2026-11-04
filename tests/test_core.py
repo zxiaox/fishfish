@@ -7,7 +7,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 from shared.common import find_latest
-from shared.core import trial, work_status, prepare_live_rounds, finish_live_round
+from shared.core import trial, work_status, work_interval, observed_work_by_day, prepare_live_rounds, finish_live_round
 from shared.updater import asset_details, check_url, verify
 
 class Tests(unittest.TestCase):
@@ -20,8 +20,23 @@ class Tests(unittest.TestCase):
         self.assertAlmostEqual(progress, 5400.5 / 28800)
         self.assertEqual(work_status(d(18,0), '09:00','17:00','18')[0], 0)
         self.assertEqual(work_status(d(18,0), '09:00','17:00','18')[1], 144)
-        for end, wage in [('08:00','1'),('17:00','NaN'),('17:00','-1')]:
+        for end, wage in [('09:00','1'),('17:00','NaN'),('17:00','-1')]:
             with self.assertRaises(ValueError): work_status(d(10,0),'09:00',end,wage)
+
+    def test_overnight_shift_and_month_rollover(self):
+        start, end, wage = '22:00', '06:00', '18'
+        remaining, earned, progress = work_status(datetime(2026, 2, 1, 1), start, end, wage)
+        self.assertEqual(remaining, 5 * 3600)
+        self.assertEqual(earned, 54)
+        self.assertEqual(progress, 3 / 8)
+        self.assertEqual(work_interval(datetime(2026, 2, 1, 1), start, end)[0], datetime(2026, 1, 31, 22))
+        self.assertEqual(work_status(datetime(2026, 2, 1, 6), start, end, wage)[1], 144)
+        self.assertEqual(work_status(datetime(2026, 2, 1, 21), start, end, wage)[1], 0)
+        result = observed_work_by_day(datetime(2026, 1, 31, 23, 59, 59, 500000), datetime(2026, 2, 1, 0, 0, 0, 500000), start, end, 1)
+        self.assertEqual(result, {'2026-01-31': .5, '2026-02-01': .5})
+        result = observed_work_by_day(datetime(2026, 2, 1, 5, 59, 59, 500000), datetime(2026, 2, 1, 6, 0, 0, 500000), start, end, 1)
+        self.assertEqual(result, {'2026-02-01': .5})
+        self.assertEqual(observed_work_by_day(datetime(2026, 2, 1, 7), datetime(2026, 2, 1, 7, 0, 1), start, end, 1), {})
 
     def test_monty_rules_and_distribution(self):
         rng = random.Random(9)

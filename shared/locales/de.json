@@ -6,7 +6,7 @@
   "hourly_wage": "Stundenlohn",
   "remaining": "Verbleibende Zeit: {time}",
   "earned": "Geschätzter Verdienst: {amount}",
-  "work_error": "Gültige Zeiten am selben Tag (Ende nach Beginn) und nicht negativen Stundenlohn eingeben.",
+  "work_error": "Gültige, unterschiedliche Start- und Endzeiten sowie einen nicht negativen Stundenlohn eingeben. Eine frühere Endzeit gilt für den Folgetag.",
   "check_updates": "Nach Updates suchen",
   "updates": "Updates",
   "update_available": "Version {version} ist verfügbar. Release-Seite öffnen?",

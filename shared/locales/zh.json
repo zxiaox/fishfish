@@ -6,7 +6,7 @@
   "hourly_wage": "时薪",
   "remaining": "剩余时间：{time}",
   "earned": "预计收入：{amount}",
-  "work_error": "请输入有效的同日时间（结束晚于开始）和非负时薪。",
+  "work_error": "请输入不同的有效开始和结束时间以及非负时薪。结束时间较早表示次日结束。",
   "check_updates": "检查更新",
   "updates": "更新",
   "update_available": "发现版本 {version}。打开发布页面？",

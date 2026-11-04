@@ -148,7 +148,7 @@ def cleanup_mode(app):
         threading.Thread(target=cleanup, daemon=True).start()
 
 def check_updates(root, app, tr, automatic=False):
-    from tkinter import messagebox
+    from shared import dialogs as messagebox
     def error():
         if not automatic: messagebox.showerror(tr('updates'), tr('update_error'), parent=root)
     def worker():

@@ -3,7 +3,8 @@ from datetime import datetime
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, filedialog
+from shared import dialogs as messagebox
 from shared.common import Translator, load_settings, save_settings, language_picker, apply_theme, set_app_icon
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import trial, prepare_live_rounds, finish_live_round
@@ -19,7 +20,7 @@ class App:
 
     def build(self):
         for child in self.root.winfo_children(): child.destroy()
-        t = self.tr; apply_theme(self.root, self.theme); self.root.title(t('monty_title')); self.root.geometry('760x610')
+        t = self.tr; self.root._fishfish_language = t.code; apply_theme(self.root, self.theme); self.root.title(t('monty_title')); self.root.geometry('760x610')
         top = ttk.Frame(self.root, padding=10); top.pack(fill='x')
         ttk.Label(top, text=t('language')).pack(side='left'); language_picker(top, self.tr.code, self.set_language)
         theme_button = ttk.Button(top, text=t('theme') + ': ' + t(self.theme), command=self.toggle_theme); theme_button.pack(side='right', padx=8)

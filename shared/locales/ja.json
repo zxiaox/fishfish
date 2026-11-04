@@ -6,7 +6,7 @@
   "hourly_wage": "時給",
   "remaining": "残り時間: {time}",
   "earned": "推定収入: {amount}",
-  "work_error": "同日内の有効な時刻（終了は開始より後）と0以上の時給を入力してください。",
+  "work_error": "異なる有効な開始・終了時刻と0以上の時給を入力してください。終了時刻が早い場合は翌日とみなします。",
   "check_updates": "更新を確認",
   "updates": "更新",
   "update_available": "バージョン {version} が利用可能です。リリースページを開きますか？",

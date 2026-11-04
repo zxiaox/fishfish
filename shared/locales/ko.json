@@ -6,7 +6,7 @@
   "hourly_wage": "시간당 임금",
   "remaining": "남은 시간: {time}",
   "earned": "예상 수입: {amount}",
-  "work_error": "유효한 당일 시간(종료가 시작 이후)과 0 이상의 임금을 입력하세요.",
+  "work_error": "서로 다른 유효한 시작 및 종료 시간과 0 이상의 시급을 입력하세요. 종료 시간이 더 이르면 다음 날로 간주합니다.",
   "check_updates": "업데이트 확인",
   "updates": "업데이트",
   "update_available": "버전 {version}을 사용할 수 있습니다. 릴리스 페이지를 여시겠습니까?",
