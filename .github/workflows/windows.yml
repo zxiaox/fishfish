@@ -1,0 +1,71 @@
+name: Windows builds
+on:
+  push:
+    branches: [main]
+    tags: ['work-motivator-v*', 'monty-hall-v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        app: [work-motivator, monty-hall]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+      - run: python -m pip install pyinstaller==6.11.1
+      - name: Build executable
+        shell: pwsh
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "${{ matrix.app }}" --paths . --add-data "shared/locales;shared/locales" "apps/${{ matrix.app }}/main.py"
+      - name: Package portable ZIP and checksums
+        shell: pwsh
+        run: ./packaging/package-windows.ps1 -App "${{ matrix.app }}" -Executable "dist/${{ matrix.app }}.exe" -OutputDirectory dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-windows
+          path: |
+            dist/${{ matrix.app }}.exe
+            dist/${{ matrix.app }}.exe.sha256
+            dist/${{ matrix.app }}-windows-x64-portable.zip
+            dist/${{ matrix.app }}-windows-x64-portable.zip.sha256
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate release tag
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+          if ($tag -notmatch '^(work-motivator|monty-hall)-v([0-9]+\.[0-9]+\.[0-9]+)$') { throw 'Invalid release tag' }
+          $app = $Matches[1]
+          $tagVersion = $Matches[2]
+          $version = python -c "from shared.common import VERSIONS; print(VERSIONS['$app'])"
+          if ($tagVersion -ne $version) { throw 'Release tag must match the app version' }
+          "APP=$app" >> $env:GITHUB_ENV
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Publish
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $dir = "artifacts/$env:APP-windows"
+          gh release create "$env:TAG" "$dir/$env:APP.exe" "$dir/$env:APP.exe.sha256" "$dir/$env:APP-windows-x64-portable.zip" "$dir/$env:APP-windows-x64-portable.zip.sha256" --verify-tag --draft --title "$env:TAG" --generate-notes
+          if ($LASTEXITCODE -ne 0) { throw 'Release creation failed' }
+          gh release edit "$env:TAG" --draft=false --latest=false
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }
