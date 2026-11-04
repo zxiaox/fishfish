@@ -11,6 +11,7 @@ from shared.common import find_latest
 from shared.core import trial, work_status, work_interval, observed_work_by_day, prepare_live_rounds, finish_live_round
 from shared.updater import asset_details, check_url, verify
 from shared.history import load_history, save_history, add_experiment
+from shared.session_record import create_game_records, append_round
 
 class Tests(unittest.TestCase):
     def test_work_bounds_and_precision(self):
@@ -80,6 +81,23 @@ class Tests(unittest.TestCase):
             path.write_text('{bad json', encoding='utf-8')
             with self.assertRaises(ValueError): load_history(path)
             self.assertEqual(path.read_text(encoding='utf-8'), '{bad json')
+
+    def test_game_text_records_preserve_precommitted_layout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            session = Path(directory) / 'three-door-time-test.txt'
+            layout = create_game_records(session, 'Round 1 — 1: Empty, 2: Prize, 3: Empty\n', 'Game session\n')
+            self.assertEqual(layout.name, 'three-door-time-test-doors.txt')
+            original = layout.read_text(encoding='utf-8')
+            append_round(session, 'Round 1: initial 1, opened 3, switch, final 2, prize 2, win.')
+            self.assertEqual(layout.read_text(encoding='utf-8'), original)
+            self.assertIn('final 2', session.read_text(encoding='utf-8'))
+            with self.assertRaises(FileExistsError): create_game_records(session, 'replacement', 'replacement')
+            self.assertEqual(layout.read_text(encoding='utf-8'), original)
+            other = Path(directory) / 'another.txt'
+            other.with_name('another-doors.txt').write_text('existing', encoding='utf-8')
+            with self.assertRaises(FileExistsError): create_game_records(other, 'replacement', 'replacement')
+            self.assertFalse(other.exists())
+            self.assertEqual(other.with_name('another-doors.txt').read_text(encoding='utf-8'), 'existing')
 
     def test_release_selection(self):
         def release(tag, **kw):

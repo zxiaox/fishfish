@@ -70,5 +70,10 @@
   "wins": "Siege",
   "losses": "Niederlagen",
   "win_rate": "Gewinnrate",
-  "history_error": "Der Verlauf konnte nicht gelesen oder gespeichert werden. Die vorhandene Datei bleibt erhalten. Details: {error}"
+  "history_error": "Der Verlauf konnte nicht gelesen oder gespeichert werden. Die vorhandene Datei bleibt erhalten. Details: {error}",
+  "save_live": "Live-Spieldaten lokal speichern",
+  "session_header": "Drei-Türen-Spielprotokoll",
+  "records_saved": "Das Spielprotokoll wird gespeichert unter:\n{path}\nDie Türbelegung wurde vor Spielbeginn gespeichert unter:\n{layout}",
+  "session_round": "Runde {number}: erste Wahl {choice}, geöffnet {revealed}, {strategy}, letzte Wahl {final}, Preis {prize}, {result}.",
+  "record_error": "Spielprotokoll konnte nicht geschrieben werden: {error}"
 }

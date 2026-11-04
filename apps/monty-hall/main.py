@@ -9,6 +9,7 @@ from shared.common import Translator, load_settings, save_settings, settings_men
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import trial, prepare_live_rounds, finish_live_round
 from shared.history import load_history, save_history, add_experiment
+from shared.session_record import create_game_records, append_round
 
 APP = 'monty-hall'; MAX_TRIALS = 100000
 
@@ -16,6 +17,7 @@ class App:
     def __init__(self, root):
         self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light')
         self.count = tk.StringVar(value='1000'); self.round_count = tk.StringVar(value='5'); self.strategy = tk.StringVar(value='switch')
+        self.save_live = tk.BooleanVar(value=self.settings.get('save_live', True)); self.session_saving = False; self.unsaved_sessions = []
         self.summary = tk.StringVar(); self.live_text = tk.StringVar(); self.rounds = []; self.results = []; self.round_index = 0; self.job = None; self.phase = 'idle'
         self.history_path = config_dir(APP) / 'history.json'
         self.history_error = None
@@ -40,6 +42,8 @@ class App:
         ttk.Label(frame, textvariable=self.summary, wraplength=690).grid(row=1,columnspan=5,pady=8)
         live = ttk.LabelFrame(self.root, text=t('live_game'), padding=12); live.pack(fill='x', padx=12, pady=8)
         ttk.Label(live,text=t('round_count')).pack(); ttk.Entry(live,textvariable=self.round_count,width=8).pack(pady=4)
+        self.save_checkbox = ttk.Checkbutton(live, text=t('save_live'), variable=self.save_live, command=self.save)
+        self.save_checkbox.pack(pady=4)
         self.start_button = ttk.Button(live,text=t('live_game'),command=self.start_game); self.start_button.pack(pady=4)
         ttk.Label(live,textvariable=self.live_text,wraplength=680,justify='center',font=('',12)).pack(pady=15)
         buttons = ttk.Frame(live); buttons.pack(pady=4)
@@ -68,7 +72,7 @@ class App:
         for table in (self.experiment_table, self.live_table): table.delete(*table.get_children())
         for entry in reversed(self.history['experiments']):
             self.experiment_table.insert('', 'end', values=(entry['date'], self.tr(entry['strategy']), entry['trials'], entry['wins'], entry['losses'], f"{entry['wins'] / entry['trials'] * 100:.2f}%"))
-        for session in reversed(self.history['live_sessions']):
+        for session in sorted(self.history['live_sessions'] + self.unsaved_sessions, key=lambda item: item['date'], reverse=True):
             for index, result in enumerate(session['rounds'], 1):
                 self.live_table.insert('', 'end', values=(session['date'], index, result['choice'], result['revealed'], result['final'], result['prize'], self.tr(result['strategy']), self.tr('win' if result['won'] else 'loss')))
 
@@ -82,13 +86,15 @@ class App:
     def update_controls(self):
         for button in (self.switch_button,self.stay_button): button.state(['!disabled' if self.phase=='choose' else 'disabled'])
         self.next_button.state(['!disabled' if self.phase=='result' and self.round_index < len(self.rounds)-1 else 'disabled'])
-        self.start_button.state(['disabled' if self.phase == 'choose' or (self.phase == 'result' and self.round_index < len(self.rounds)-1) else '!disabled'])
+        running = self.phase == 'choose' or (self.phase == 'result' and self.round_index < len(self.rounds)-1)
+        self.start_button.state(['disabled' if running else '!disabled'])
+        self.save_checkbox.state(['disabled' if running else '!disabled'])
         if self.phase == 'choose': self.show_round()
         elif self.phase == 'result' and self.results: self.show_result()
 
     def set_language(self, code): self.tr = Translator(code); self.save(); self.build()
     def set_theme(self, theme): self.theme = theme; self.save(); self.build()
-    def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme})
+    def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme,'save_live':self.save_live.get()})
     def close(self): self.save(); self.root.destroy()
 
     def run_experiment(self):
@@ -113,22 +119,28 @@ class App:
             count = int(self.round_count.get())
             if not 1 <= count <= 20: raise ValueError()
         except ValueError: messagebox.showerror(self.tr('error'),self.tr('round_error'),parent=self.root); return
-        filename = 'three-doors-' + datetime.now().strftime('%Y%m%d-%H%M%S') + '.txt'
-        path = filedialog.asksaveasfilename(parent=self.root, initialfile=filename, defaultextension='.txt', filetypes=[('Text','*.txt')])
-        if not path: return
         rounds = prepare_live_rounds(count)
-        lines = []
-        for i, r in enumerate(rounds, 1):
-            layout = ', '.join(f'{door}: '+self.tr('prize' if door==r['prize'] else 'empty') for door in (1,2,3))
-            lines.append(f"{self.tr('round_label', number=i)} — {layout}")
-        try:
-            with open(path, 'x', encoding='utf-8') as f: f.write('\n'.join(lines)+'\n')
-        except FileExistsError:
-            messagebox.showerror(self.tr('error'),self.tr('file_exists'),parent=self.root); return
-        except OSError as exc: messagebox.showerror(self.tr('error'),str(exc),parent=self.root); return
-        self.rounds = rounds; self.results = []; self.round_index = 0; self.phase = 'choose'; self.record_path = path
+        saving = self.save_live.get()
+        path = None
+        if saving:
+            filename = 'three-door-time-' + datetime.now().strftime('%Y%m%d-%H%M%S') + '.txt'
+            path = filedialog.asksaveasfilename(parent=self.root, initialfile=filename, defaultextension='.txt', filetypes=[('Text','*.txt')])
+            if not path: return
+            lines = []
+            for i, r in enumerate(rounds, 1):
+                layout = ', '.join(f'{door}: '+self.tr('prize' if door==r['prize'] else 'empty') for door in (1,2,3))
+                lines.append(f"{self.tr('round_label', number=i)} — {layout}")
+            try:
+                layout_path = create_game_records(path, '\n'.join(lines)+'\n', self.tr('session_header')+'\n')
+            except FileExistsError:
+                messagebox.showerror(self.tr('error'), self.tr('file_exists'), parent=self.root); return
+            except OSError as exc:
+                messagebox.showerror(self.tr('error'), str(exc), parent=self.root); return
+        self.rounds = rounds; self.results = []; self.round_index = 0; self.phase = 'choose'; self.record_path = path; self.session_saving = saving
         self.session = {'date': datetime.now().isoformat(timespec='seconds'), 'record_path': path, 'rounds': self.results}
-        messagebox.showinfo(self.tr('live_game'),self.tr('record_saved',path=path),parent=self.root); self.update_controls()
+        if saving:
+            messagebox.showinfo(self.tr('live_game'), self.tr('records_saved', path=path, layout=layout_path), parent=self.root)
+        self.update_controls()
 
     def show_round(self):
         r=self.rounds[self.round_index]
@@ -136,9 +148,16 @@ class App:
 
     def play(self, strategy):
         if self.phase != 'choose': return
-        if not self.results: self.history['live_sessions'].append(self.session)
+        if not self.results:
+            (self.history['live_sessions'] if self.session_saving else self.unsaved_sessions).append(self.session)
         self.results.append(finish_live_round(self.rounds[self.round_index],strategy))
-        self.persist_history(); self.refresh_history(); self.logs.select(1)
+        if self.session_saving:
+            r = self.results[-1]
+            line = self.tr('session_round', number=len(self.results), choice=r['choice'], revealed=r['revealed'], strategy=self.tr(r['strategy']), final=r['final'], prize=r['prize'], result=self.tr('win' if r['won'] else 'loss'))
+            try: append_round(self.record_path, line)
+            except OSError as exc: messagebox.showerror(self.tr('error'), self.tr('record_error', error=str(exc)), parent=self.root)
+            self.persist_history()
+        self.refresh_history(); self.logs.select(1)
         self.phase='result'; self.show_result(); self.update_controls()
 
     def show_result(self):

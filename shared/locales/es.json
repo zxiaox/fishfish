@@ -70,5 +70,10 @@
   "wins": "Victorias",
   "losses": "Derrotas",
   "win_rate": "Porcentaje de victorias",
-  "history_error": "No se pudo leer o guardar el historial. El archivo existente se ha conservado. Detalles: {error}"
+  "history_error": "No se pudo leer o guardar el historial. El archivo existente se ha conservado. Detalles: {error}",
+  "save_live": "Guardar datos de la partida en el equipo",
+  "session_header": "Registro de la partida de tres puertas",
+  "records_saved": "El registro de la partida se guardará en:\n{path}\nLa distribución de puertas se guardó antes de jugar en:\n{layout}",
+  "session_round": "Ronda {number}: elección inicial {choice}, puerta abierta {revealed}, {strategy}, elección final {final}, premio {prize}, {result}.",
+  "record_error": "No se pudo escribir el registro de la partida: {error}"
 }

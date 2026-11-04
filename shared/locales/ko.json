@@ -70,5 +70,10 @@
   "wins": "승리",
   "losses": "패배",
   "win_rate": "승률",
-  "history_error": "기록을 읽거나 저장할 수 없습니다. 기존 파일은 보존됩니다. 상세: {error}"
+  "history_error": "기록을 읽거나 저장할 수 없습니다. 기존 파일은 보존됩니다. 상세: {error}",
+  "save_live": "라이브 게임 데이터를 로컬에 저장",
+  "session_header": "세 개의 문 게임 기록",
+  "records_saved": "게임 기록 저장 위치:\n{path}\n게임 전 문 배치 저장 위치:\n{layout}",
+  "session_round": "라운드 {number}: 처음 {choice}, 열린 문 {revealed}, {strategy}, 최종 {final}, 상품 {prize}, {result}.",
+  "record_error": "게임 기록을 저장할 수 없습니다: {error}"
 }

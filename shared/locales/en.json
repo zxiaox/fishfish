@@ -70,5 +70,10 @@
   "wins": "Wins",
   "losses": "Losses",
   "win_rate": "Win rate",
-  "history_error": "History could not be read or saved. The existing file has been preserved. Details: {error}"
+  "history_error": "History could not be read or saved. The existing file has been preserved. Details: {error}",
+  "save_live": "Save live-game data locally",
+  "session_header": "Three Doors game session",
+  "records_saved": "The session record will be saved to:\n{path}\nThe door layouts were saved before play to:\n{layout}",
+  "session_round": "Round {number}: initial {choice}, opened {revealed}, {strategy}, final {final}, prize {prize}, {result}.",
+  "record_error": "Could not write the session record: {error}"
 }
