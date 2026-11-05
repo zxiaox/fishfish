@@ -93,5 +93,22 @@
   "war_network_note": "プレイヤー間の接続が必要です。仮想LAN/VPNを使うか、ホストがUDP 6112とゲームが通知するTCPポートをPCに転送してください。インターネットへの直接接続は暗号化されません。",
   "war_connect_error": "ブリッジを開始できません: {error}",
   "war_relay_error": "ゲーム接続に失敗しました: {error}",
-  "war_exe_error": "存在する Warcraft III の .exe ファイルを選択してください。"
+  "war_exe_error": "存在する Warcraft III の .exe ファイルを選択してください。",
+  "war_config": "ロビーサーバー設定",
+  "war_auto_help": "ロビーサーバーの設定後、アプリが自動接続し、他のプレイヤーのクラシック版 Warcraft III の部屋をゲームのLAN一覧に表示します。",
+  "war_setup_note": "サーバー運営者はアプリを起動したまま、ルーターとファイアウォールでサーバーのTCPポートを転送し、公開アドレス・ポート・証明書フィンガープリントを共有してください。",
+  "war_offline": "未接続。",
+  "war_host_mode": "1人のプレイヤーがこのPCで共有ロビーとリレーサーバーを実行できます。",
+  "war_run_server": "このPCでロビーサーバーを実行",
+  "war_server": "ロビーサーバーのアドレス",
+  "war_server_port": "サーバーTCPポート",
+  "war_fingerprint": "サーバー証明書のフィンガープリント（SHA-256）",
+  "war_copy": "コピー",
+  "war_config_error": "有効なサーバーアドレス、ポート、64文字のフィンガープリントを入力してください。",
+  "war_server_starting": "ロビーサーバーを起動中…",
+  "war_server_failed": "ロビーサーバーエラー: {error}",
+  "war_connecting": "ロビーサーバーに接続中…",
+  "war_online": "接続済み。遠隔ロビー: {count}件。Warcraft III のLAN一覧を開いてください。",
+  "war_game_connected": "ゲーム接続を確立しました。",
+  "war_connection_error": "接続の問題: {error}"
 }

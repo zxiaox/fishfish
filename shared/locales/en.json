@@ -93,5 +93,22 @@
   "war_network_note": "Players need network reachability: use a virtual LAN/VPN, or the host must forward UDP 6112 and the game’s announced TCP port to their PC. Direct public connections are not encrypted.",
   "war_connect_error": "Could not start the bridge: {error}",
   "war_relay_error": "Game connection failed: {error}",
-  "war_exe_error": "Choose an existing Warcraft III .exe file."
+  "war_exe_error": "Choose an existing Warcraft III .exe file.",
+  "war_config": "Lobby server setup",
+  "war_auto_help": "After the lobby server is configured, this app connects automatically and makes other players’ Classic Warcraft III lobbies visible in the game’s LAN menu.",
+  "war_setup_note": "The server operator must keep this app open, forward the server TCP port through their router/firewall, and share their public address, port, and certificate fingerprint with players.",
+  "war_offline": "Disconnected.",
+  "war_host_mode": "One player can run the shared lobby and relay server on this computer.",
+  "war_run_server": "Run the lobby server on this computer",
+  "war_server": "Lobby server address",
+  "war_server_port": "Server TCP port",
+  "war_fingerprint": "Server certificate fingerprint (SHA-256)",
+  "war_copy": "Copy fingerprint",
+  "war_config_error": "Enter a valid server address, port, and 64-character fingerprint.",
+  "war_server_starting": "Starting the lobby server…",
+  "war_server_failed": "Lobby server failed: {error}",
+  "war_connecting": "Connecting to the lobby server…",
+  "war_online": "Connected. Available remote lobbies: {count}. Open Warcraft III → Local Area Network.",
+  "war_game_connected": "Game connection established.",
+  "war_connection_error": "Connection problem: {error}"
 }

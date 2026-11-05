@@ -7,7 +7,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-VERSIONS = {'work-motivator': '1.0.3', 'monty-hall': '1.0.4', 'war3-battle-platform': '1.0.0'}
+VERSIONS = {'work-motivator': '1.0.3', 'monty-hall': '1.0.4', 'war3-battle-platform': '1.0.1'}
 LANGUAGES = {'English': 'en', '简体中文': 'zh', '한국어': 'ko', '日本語': 'ja', 'ไทย': 'th', 'Deutsch': 'de', 'Español': 'es'}
 REPO = 'zxiaox/fishfish'
 
@@ -106,13 +106,13 @@ def set_app_icon(root, app_id):
     root.iconphoto(True, __import__('tkinter').PhotoImage(file=str(resource_root() / 'assets' / (app_id + '.png'))))
 
 
-def settings_menu(root, tr, current_theme, set_language, set_theme, check_update, app_settings=None):
+def settings_menu(root, tr, current_theme, set_language, set_theme, check_update, app_settings=None, app_settings_label=None):
     """Install a native top-left Settings menu shared by every app."""
     import tkinter as tk
     menubar = tk.Menu(root)
     menu = tk.Menu(menubar, tearoff=False)
     if app_settings:
-        menu.add_command(label=tr('work_config'), command=app_settings)
+        menu.add_command(label=app_settings_label or tr('work_config'), command=app_settings)
         menu.add_separator()
     languages = tk.Menu(menu, tearoff=False)
     for name, code in LANGUAGES.items():

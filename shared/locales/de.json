@@ -93,5 +93,22 @@
   "war_network_note": "Spieler müssen einander erreichen können: virtuelles LAN/VPN nutzen oder UDP 6112 und den vom Spiel gemeldeten TCP-Port am Router zum Host-PC weiterleiten. Direkte öffentliche Verbindungen sind unverschlüsselt.",
   "war_connect_error": "Brücke konnte nicht gestartet werden: {error}",
   "war_relay_error": "Spielverbindung fehlgeschlagen: {error}",
-  "war_exe_error": "Eine vorhandene Warcraft-III-.exe-Datei auswählen."
+  "war_exe_error": "Eine vorhandene Warcraft-III-.exe-Datei auswählen.",
+  "war_config": "Lobbyserver einrichten",
+  "war_auto_help": "Nach der Einrichtung verbindet sich die App automatisch und zeigt Classic-Warcraft-III-Lobbys anderer Spieler in der LAN-Liste des Spiels.",
+  "war_setup_note": "Der Serverbetreiber muss die App geöffnet lassen, den TCP-Port im Router und in der Firewall freigeben und öffentliche Adresse, Port und Zertifikat-Fingerabdruck mit den Spielern teilen.",
+  "war_offline": "Nicht verbunden.",
+  "war_host_mode": "Ein Spieler kann den gemeinsamen Lobby- und Relayserver auf diesem Computer ausführen.",
+  "war_run_server": "Lobbyserver auf diesem Computer ausführen",
+  "war_server": "Adresse des Lobbyservers",
+  "war_server_port": "TCP-Port des Servers",
+  "war_fingerprint": "Zertifikat-Fingerabdruck des Servers (SHA-256)",
+  "war_copy": "Fingerabdruck kopieren",
+  "war_config_error": "Gültige Serveradresse, Port und 64-stelligen Fingerabdruck eingeben.",
+  "war_server_starting": "Lobbyserver wird gestartet…",
+  "war_server_failed": "Lobbyserver fehlgeschlagen: {error}",
+  "war_connecting": "Verbindung zum Lobbyserver wird hergestellt…",
+  "war_online": "Verbunden. Verfügbare entfernte Lobbys: {count}. In Warcraft III die LAN-Liste öffnen.",
+  "war_game_connected": "Spielverbindung hergestellt.",
+  "war_connection_error": "Verbindungsproblem: {error}"
 }

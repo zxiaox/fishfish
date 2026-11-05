@@ -93,5 +93,22 @@
   "war_network_note": "玩家之间需要网络可达：使用虚拟局域网/VPN，或由房主将 UDP 6112 和游戏公布的 TCP 端口转发至自己的电脑。直接公网连接不加密。",
   "war_connect_error": "无法启动桥接：{error}",
   "war_relay_error": "游戏连接失败：{error}",
-  "war_exe_error": "请选择存在的魔兽争霸 III .exe 文件。"
+  "war_exe_error": "请选择存在的魔兽争霸 III .exe 文件。",
+  "war_config": "大厅服务器设置",
+  "war_auto_help": "配置大厅服务器后，应用会自动连接，并在魔兽争霸 III 的局域网列表中显示其他玩家的经典版游戏。",
+  "war_setup_note": "服务器运行者需要保持本应用开启，在路由器和防火墙中转发服务器 TCP 端口，并向玩家分享公网地址、端口和证书指纹。",
+  "war_offline": "未连接。",
+  "war_host_mode": "一名玩家可以在此电脑运行共享大厅和中继服务器。",
+  "war_run_server": "在此电脑运行大厅服务器",
+  "war_server": "大厅服务器地址",
+  "war_server_port": "服务器 TCP 端口",
+  "war_fingerprint": "服务器证书指纹（SHA-256）",
+  "war_copy": "复制指纹",
+  "war_config_error": "请输入有效的服务器地址、端口和64位证书指纹。",
+  "war_server_starting": "正在启动大厅服务器…",
+  "war_server_failed": "大厅服务器出错：{error}",
+  "war_connecting": "正在连接大厅服务器…",
+  "war_online": "已连接。可用远程房间：{count}。请打开魔兽争霸 III → 局域网。",
+  "war_game_connected": "游戏连接已建立。",
+  "war_connection_error": "连接问题：{error}"
 }
