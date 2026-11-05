@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
 from tkinter import ttk, filedialog
 from shared import dialogs as messagebox
-from shared.common import Translator, load_settings, save_settings, settings_menu, apply_theme, set_app_icon, config_dir
+from shared.common import Translator, VERSIONS, load_settings, save_settings, settings_menu, apply_theme, set_app_icon, config_dir
 from shared.dialogs import center_window
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from mesh import LobbyClient
@@ -16,13 +16,20 @@ from server_host import HostedBroker, ensure_certificate
 
 APP = 'war3-battle-platform'
 
+
+def empty_scan_stats():
+    return {'queries':0, 'responses':0, 'accepted':0, 'rejected':0,
+            'last_source_port':0, 'game_version':0, 'product':'',
+            'publish_sent':0, 'publish_ack':0, 'publish_rejected':0,
+            'server_id':'unknown', 'peers':0}
+
 class App:
     def __init__(self, root):
         self.root=root; self.settings=load_settings(APP); self.tr=Translator(self.settings.get('language','en')); self.theme=self.settings.get('theme','light')
         self.server_host=self.settings.get('server_host',''); self.server_port=self.settings.get('server_port',47653)
         self.fingerprint=self.settings.get('fingerprint',''); self.host_mode=self.settings.get('host_mode',False)
         self.path=tk.StringVar(value=self.settings.get('path','')); self.status=tk.StringVar(); self.status_key=('war_offline',{})
-        self.discovery=tk.StringVar(); self.discovery_key=('war_local_offline',{}); self.scan_stats={'queries':0,'responses':0,'accepted':0,'rejected':0,'last_source_port':0,'game_version':0,'product':'','publish_sent':0,'publish_ack':0,'publish_rejected':0,'server_id':'unknown','peers':0}; self.remote_count=0; self.local_name=''
+        self.discovery=tk.StringVar(); self.discovery_key=('war_local_offline',{}); self.scan_stats=empty_scan_stats(); self.remote_count=0; self.local_name=''
         self.events=queue.Queue(); self.client=None; self.server=None; self.generation=0; self.connecting=False; self.retry_enabled=True
         set_app_icon(root,APP); self.build(); self.set_status('war_offline'); self.set_discovery('war_local_offline'); root.protocol('WM_DELETE_WINDOW',self.close)
         root.after(100,self.poll); root.after(300,self.startup)
@@ -110,18 +117,22 @@ class App:
     def connect(self):
         if self.client or self.connecting: return
         if not self.server_host or not re.fullmatch('[0-9a-f]{64}',self.fingerprint): self.open_settings(); return
-        self.retry_enabled=True; self.connecting=True; self.remote_count=0; self.generation+=1; generation=self.generation
-        self.set_status('war_connecting'); self.set_discovery('war_local_search'); self.update_buttons()
+        self.retry_enabled=True; self.connecting=True; self.reset_session(); self.generation+=1; generation=self.generation
+        self.set_status('war_connecting'); self.update_buttons()
         def worker():
             candidate=LobbyClient(self.server_host,self.server_port,self.fingerprint,lambda kind,info:self.events.put((generation,kind,info)))
             try: candidate.start(); self.events.put((generation,'client_ready',candidate))
             except Exception as exc: candidate.stop(); self.events.put((generation,'connect_error',str(exc)))
         threading.Thread(target=worker,daemon=True).start()
 
+    def reset_session(self):
+        self.local_name=''; self.remote_count=0; self.scan_stats=empty_scan_stats()
+        self.set_discovery('war_local_offline')
+
     def disconnect(self):
         self.retry_enabled=False; self.generation+=1; self.connecting=False
         if self.client: self.client.stop(); self.client=None
-        self.local_name=''; self.set_status('war_offline'); self.set_discovery('war_local_offline'); self.update_buttons()
+        self.reset_session(); self.set_status('war_offline'); self.update_buttons()
 
     def shutdown_network(self):
         self.disconnect()
@@ -140,7 +151,10 @@ class App:
                 if generation != self.generation:
                     if kind=='client_ready': info.stop()
                     continue
-                if kind=='client_ready': self.connecting=False; self.client=info; self.set_status('war_online',count=self.remote_count); self.update_buttons()
+                if kind=='client_ready':
+                    self.connecting=False; self.client=info; self.set_status('war_online',count=self.remote_count)
+                    if self.discovery_key[0]=='war_local_offline': self.set_discovery('war_local_search')
+                    self.update_buttons()
                 elif kind=='lobbies': self.remote_count=info; self.set_status('war_online',count=info)
                 elif kind=='local_found': self.local_name=info; self.set_discovery('war_local_found',name=info)
                 elif kind=='published' and self.local_name: self.set_discovery('war_local_published',name=self.local_name)
@@ -149,9 +163,9 @@ class App:
                 elif kind=='scan_stats': self.scan_stats=info
                 elif kind=='game_connected': self.set_status('war_game_connected')
                 elif kind in ('connect_error','error'):
-                    self.connecting=False
+                    self.generation+=1; self.connecting=False
                     if self.client: self.client.stop(); self.client=None
-                    self.set_status('war_connection_error',error=info); self.update_buttons()
+                    self.reset_session(); self.set_status('war_connection_error',error=info); self.update_buttons()
                     if self.retry_enabled: self.root.after(5000,lambda:self.connect() if self.retry_enabled and not self.client and not self.connecting else None)
                 elif kind=='relay_error': self.set_status('war_connection_error',error=info)
         except queue.Empty: pass
@@ -159,7 +173,7 @@ class App:
 
     def copy_diagnostics(self):
         stats=self.client.snapshot() if self.client else self.scan_stats
-        text=(f"War3 Battle Platform 1.0.4\n{self.status.get()}\n{self.discovery.get()}\n"
+        text=(f"War3 Battle Platform {VERSIONS[APP]}\n{self.status.get()}\n{self.discovery.get()}\n"
               f"UDP queries: {stats['queries']}; local replies: {stats['responses']}; "
               f"accepted: {stats['accepted']}; rejected: {stats['rejected']}; last local source port: {stats['last_source_port']}\n"
               f"Server ID: {stats['server_id']}; connected peers: {stats['peers']}; "

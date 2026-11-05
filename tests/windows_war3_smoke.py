@@ -27,5 +27,14 @@ with tempfile.TemporaryDirectory() as directory:
     app.poll()
     assert '1' in app.status.get(), app.status.get()
     assert 'Test Lobby' in app.discovery.get(), app.discovery.get()
+    app.retry_enabled = False
+    app.scan_stats.update({'server_id':'old-server', 'peers':2, 'queries':42})
+    old_generation = app.generation
+    app.events.put((old_generation, 'error', 'timed out'))
+    app.events.put((old_generation, 'scan_stats', {'server_id':'old-server', 'peers':2}))
+    app.poll()
+    assert app.scan_stats['server_id'] == 'unknown', app.scan_stats
+    assert app.scan_stats['peers'] == 0, app.scan_stats
+    assert app.discovery.get() == app.tr('war_local_offline'), app.discovery.get()
     app.close()
 print('War3 Battle Platform Windows UI startup passed.')
