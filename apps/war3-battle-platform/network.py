@@ -4,6 +4,7 @@ Packet layout informed by WC3LanGame (MIT), https://github.com/Qyperion/WC3LanGa
 The program does not provide a VPN, NAT traversal, or transport encryption.
 """
 import ipaddress
+import sys
 import select
 import socket
 import struct
@@ -33,9 +34,16 @@ def parse_announcement(data, game, version):
     if not port: raise ValueError('Invalid game port')
     game_id = struct.unpack_from('<I', data, 12)[0]
     raw_name = data[20:data.index(b'\0', 20)]
-    for encoding in ('utf-8', 'mbcs', 'gb18030'):
+    encodings = ['utf-8', 'gb18030', 'mbcs']
+    if sys.platform == 'win32':
+        import ctypes
+        if ctypes.windll.kernel32.GetACP() in (932, 949, 950):
+            encodings = ['utf-8', 'mbcs', 'gb18030']
+    for encoding in encodings:
         try:
-            name = raw_name.decode(encoding)[:128]; break
+            name = raw_name.decode(encoding)[:128]
+            if '\ufffd' in name: continue
+            break
         except (UnicodeDecodeError, LookupError):
             continue
     else:

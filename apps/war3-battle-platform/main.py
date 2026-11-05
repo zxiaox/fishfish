@@ -159,7 +159,7 @@ class App:
 
     def copy_diagnostics(self):
         stats=self.client.snapshot() if self.client else self.scan_stats
-        text=(f"War3 Battle Platform 1.0.3\n{self.status.get()}\n{self.discovery.get()}\n"
+        text=(f"War3 Battle Platform 1.0.4\n{self.status.get()}\n{self.discovery.get()}\n"
               f"UDP queries: {stats['queries']}; local replies: {stats['responses']}; "
               f"accepted: {stats['accepted']}; rejected: {stats['rejected']}; last local source port: {stats['last_source_port']}\n"
               f"Server ID: {stats['server_id']}; connected peers: {stats['peers']}; "
