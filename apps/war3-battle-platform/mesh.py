@@ -79,6 +79,7 @@ class LobbyClient:
         self.stop_event=threading.Event(); self.send_lock=threading.Lock(); self.lock=threading.Lock()
         self.control=None; self.udp=None; self.lobbies={}; self.pending={}; self.active=set(); self.threads=[]; self.local_port=None; self.last_local=0
         self.local_addresses=_local_addresses()
+        self.stats={'queries':0, 'responses':0, 'accepted':0, 'rejected':0, 'last_source_port':0}
 
     def start(self):
         self.control=self.connect_socket(); self.control.settimeout(8)
@@ -97,10 +98,10 @@ class LobbyClient:
         last_ping=time.monotonic(); buffer=bytearray()
         try:
             while not self.stop_event.is_set():
+                if time.monotonic()-last_ping>12:
+                    self._send({'type':'ping'}); last_ping=time.monotonic()
                 try: msg=read_json(self.control, buffer)
-                except socket.timeout:
-                    if time.monotonic()-last_ping>12: self._send({'type':'ping'}); last_ping=time.monotonic()
-                    continue
+                except socket.timeout: continue
                 kind=msg.get('type')
                 if kind=='lobbies': self._set_lobbies(msg.get('lobbies', []))
                 elif kind=='incoming': self._spawn(self._host_relay,msg)
@@ -120,16 +121,34 @@ class LobbyClient:
             while not self.stop_event.is_set():
                 now=time.monotonic()
                 if now-last_query>=3:
-                    for game in ('TFT','ROC'):
-                        for version in range(21,30): self.udp.sendto(search_packet(game,version),('127.0.0.1',self.game_udp_port))
+                    # Some Classic builds bind discovery to a physical adapter rather than loopback.
+                    targets = sorted(self.local_addresses | {'127.0.0.1', '255.255.255.255'})
+                    for target in targets:
+                        for game in ('TFT','ROC'):
+                            for version in range(21,30):
+                                try:
+                                    self.udp.sendto(search_packet(game,version),(target,self.game_udp_port))
+                                    with self.lock: self.stats['queries'] += 1
+                                except OSError:
+                                    # An interface can disappear or reject a broadcast while others remain usable.
+                                    continue
                     last_query=now
+                    self.callback('scan_stats', self.snapshot())
                 try: data, addr=self.udp.recvfrom(1401)
                 except (socket.timeout, ConnectionResetError): data=None
-                if data and addr[0]=='127.0.0.1' and addr[1]==self.game_udp_port and len(data)>=12:
-                    version=struct.unpack_from('<I',data,8)[0]; edition='TFT' if data[4:8]==b'PX3W' else 'ROC'
-                    try: game_id, game_port, name=parse_announcement(data,edition,version)
-                    except ValueError: continue
-                    with self.lock: self.local_port=game_port
+                if data and addr[0] in self.local_addresses:
+                    with self.lock:
+                        self.stats['responses'] += 1; self.stats['last_source_port'] = addr[1]
+                    try:
+                        if len(data) < 12: raise ValueError('short packet')
+                        version=struct.unpack_from('<I',data,8)[0]; edition='TFT' if data[4:8]==b'PX3W' else 'ROC'
+                        game_id, game_port, name=parse_announcement(data,edition,version)
+                    except ValueError:
+                        with self.lock: self.stats['rejected'] += 1
+                        continue
+                    with self.lock:
+                        self.local_port=game_port; self.local_game_address=addr[0]; self.stats['accepted'] += 1
+                    if not last_published: self.callback('local_found', name)
                     self.last_local=time.monotonic()
                     encoded=base64.b64encode(data).decode('ascii')
                     if encoded != last_published:
@@ -137,11 +156,15 @@ class LobbyClient:
                 if last_published and time.monotonic()-self.last_local>10:
                     self._send({'type':'withdraw'}); last_published=None
                     with self.lock: self.local_port=None
+                    self.callback('local_lost', '')
                 # LAN clients forget lobbies without periodic announcements.
                 if now-last_announce>=2:
                     self._announce_all(); last_announce=now
         except (OSError, ValueError) as exc:
             if not self.stop_event.is_set(): self.callback('error',str(exc))
+
+    def snapshot(self):
+        with self.lock: return dict(self.stats)
 
     def _set_lobbies(self, records):
         if not isinstance(records,list) or len(records)>128: raise ValueError('Invalid lobby list')
@@ -210,10 +233,10 @@ class LobbyClient:
             with self.lock: self.active.discard(client)
 
     def _host_relay(self,msg):
-        with self.lock: port=self.local_port
+        with self.lock: port=self.local_port; address=getattr(self,'local_game_address','127.0.0.1')
         if not port: return
         try:
-            local=socket.create_connection(('127.0.0.1',port),timeout=5)
+            local=socket.create_connection((address,port),timeout=5)
             try: remote=self._attach(msg,'host')
             except Exception: local.close(); raise
             with self.lock: self.active.update((local,remote))

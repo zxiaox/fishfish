@@ -110,5 +110,10 @@
   "war_connecting": "로비 서버 연결 중…",
   "war_online": "연결됨. 원격 방: {count}개. 워크래프트 III의 LAN 목록을 여세요.",
   "war_game_connected": "게임 연결이 수립되었습니다.",
-  "war_connection_error": "연결 문제: {error}"
+  "war_connection_error": "연결 문제: {error}",
+  "war_local_offline": "로컬 게임 검색이 중지되었습니다.",
+  "war_local_search": "이 컴퓨터에서 호스팅 중인 LAN 게임을 검색 중…",
+  "war_local_found": "로컬 LAN 게임 발견: {name}.",
+  "war_copy_diag": "진단 정보 복사",
+  "war_diag_copied": "진단 정보를 복사했습니다. 지원 메시지에 붙여 넣을 수 있습니다."
 }

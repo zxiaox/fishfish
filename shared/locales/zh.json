@@ -110,5 +110,10 @@
   "war_connecting": "正在连接大厅服务器…",
   "war_online": "已连接。可用远程房间：{count}。请打开魔兽争霸 III → 局域网。",
   "war_game_connected": "游戏连接已建立。",
-  "war_connection_error": "连接问题：{error}"
+  "war_connection_error": "连接问题：{error}",
+  "war_local_offline": "本机游戏扫描已停止。",
+  "war_local_search": "正在搜索此电脑创建的局域网游戏…",
+  "war_local_found": "已检测到本机局域网游戏：{name}。",
+  "war_copy_diag": "复制诊断信息",
+  "war_diag_copied": "诊断信息已复制，可以粘贴到支持消息中。"
 }

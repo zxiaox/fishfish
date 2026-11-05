@@ -110,5 +110,10 @@
   "war_connecting": "Connecting to the lobby server…",
   "war_online": "Connected. Available remote lobbies: {count}. Open Warcraft III → Local Area Network.",
   "war_game_connected": "Game connection established.",
-  "war_connection_error": "Connection problem: {error}"
+  "war_connection_error": "Connection problem: {error}",
+  "war_local_offline": "Local game scan is stopped.",
+  "war_local_search": "Searching this computer for a hosted LAN game…",
+  "war_local_found": "Local LAN game detected: {name}.",
+  "war_copy_diag": "Copy diagnostics",
+  "war_diag_copied": "Diagnostics copied. You can paste them into your support message."
 }

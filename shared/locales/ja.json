@@ -110,5 +110,10 @@
   "war_connecting": "ロビーサーバーに接続中…",
   "war_online": "接続済み。遠隔ロビー: {count}件。Warcraft III のLAN一覧を開いてください。",
   "war_game_connected": "ゲーム接続を確立しました。",
-  "war_connection_error": "接続の問題: {error}"
+  "war_connection_error": "接続の問題: {error}",
+  "war_local_offline": "ローカルゲームの検索は停止中です。",
+  "war_local_search": "このPCでホストされているLANゲームを検索中…",
+  "war_local_found": "ローカルLANゲームを検出: {name}。",
+  "war_copy_diag": "診断情報をコピー",
+  "war_diag_copied": "診断情報をコピーしました。サポートメッセージに貼り付けられます。"
 }

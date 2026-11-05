@@ -110,5 +110,10 @@
   "war_connecting": "กำลังเชื่อมต่อเซิร์ฟเวอร์ล็อบบี้…",
   "war_online": "เชื่อมต่อแล้ว ห้องระยะไกลที่ใช้ได้: {count} เปิดรายการ LAN ใน Warcraft III",
   "war_game_connected": "เชื่อมต่อเกมแล้ว",
-  "war_connection_error": "ปัญหาการเชื่อมต่อ: {error}"
+  "war_connection_error": "ปัญหาการเชื่อมต่อ: {error}",
+  "war_local_offline": "หยุดค้นหาเกมในเครื่องแล้ว",
+  "war_local_search": "กำลังค้นหาเกม LAN ที่สร้างบนคอมพิวเตอร์นี้…",
+  "war_local_found": "พบเกม LAN ในเครื่อง: {name}",
+  "war_copy_diag": "คัดลอกข้อมูลวินิจฉัย",
+  "war_diag_copied": "คัดลอกข้อมูลวินิจฉัยแล้ว คุณสามารถวางในข้อความขอความช่วยเหลือได้"
 }

@@ -110,5 +110,10 @@
   "war_connecting": "Verbindung zum Lobbyserver wird hergestellt…",
   "war_online": "Verbunden. Verfügbare entfernte Lobbys: {count}. In Warcraft III die LAN-Liste öffnen.",
   "war_game_connected": "Spielverbindung hergestellt.",
-  "war_connection_error": "Verbindungsproblem: {error}"
+  "war_connection_error": "Verbindungsproblem: {error}",
+  "war_local_offline": "Suche nach lokalem Spiel gestoppt.",
+  "war_local_search": "Suche nach einem LAN-Spiel auf diesem Computer…",
+  "war_local_found": "Lokales LAN-Spiel erkannt: {name}.",
+  "war_copy_diag": "Diagnose kopieren",
+  "war_diag_copied": "Diagnose kopiert. Sie kann in eine Supportnachricht eingefügt werden."
 }

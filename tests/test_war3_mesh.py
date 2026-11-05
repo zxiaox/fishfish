@@ -23,6 +23,26 @@ def packet(port):
 
 
 class MeshTests(unittest.IsolatedAsyncioTestCase):
+    async def test_detects_classic_127_from_local_adapter(self):
+        events=[]; sent=[]; datagrams=[]
+        client=LobbyClient('127.0.0.1',1,'',lambda kind,info: events.append((kind,info)),game_udp_port=6112)
+        client.local_addresses={'192.0.2.10'}
+        value=bytearray(packet(6113)); struct.pack_into('<I',value,8,27)
+        class FakeSocket:
+            def sendto(self, data, target): datagrams.append((data,target))
+            def recvfrom(self, size): return bytes(value), ('192.0.2.10',6114)
+        client.udp=FakeSocket()
+        def publish(message):
+            sent.append(message); client.stop_event.set()
+        client._send=publish
+        client._local_loop()
+        self.assertIn(('local_found','Lobby'),events)
+        self.assertEqual(sent[0]['type'],'publish')
+        self.assertTrue(any(target==('192.0.2.10',6112) and data[8:12]==struct.pack('<I',27) for data,target in datagrams))
+        self.assertEqual(client.local_game_address,'192.0.2.10')
+        self.assertEqual(client.snapshot()['accepted'],1)
+        self.assertEqual(client.snapshot()['last_source_port'],6114)
+
     async def test_automatic_discovery_and_relay(self):
         temporary=tempfile.TemporaryDirectory()
         cert,key,fingerprint=ensure_certificate(temporary.name)

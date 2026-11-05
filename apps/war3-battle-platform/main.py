@@ -22,8 +22,9 @@ class App:
         self.server_host=self.settings.get('server_host',''); self.server_port=self.settings.get('server_port',47653)
         self.fingerprint=self.settings.get('fingerprint',''); self.host_mode=self.settings.get('host_mode',False)
         self.path=tk.StringVar(value=self.settings.get('path','')); self.status=tk.StringVar(); self.status_key=('war_offline',{})
+        self.discovery=tk.StringVar(); self.discovery_key=('war_local_offline',{}); self.scan_stats={'queries':0,'responses':0,'accepted':0,'rejected':0,'last_source_port':0}; self.remote_count=0
         self.events=queue.Queue(); self.client=None; self.server=None; self.generation=0; self.connecting=False; self.retry_enabled=True
-        set_app_icon(root,APP); self.build(); self.set_status('war_offline'); root.protocol('WM_DELETE_WINDOW',self.close)
+        set_app_icon(root,APP); self.build(); self.set_status('war_offline'); self.set_discovery('war_local_offline'); root.protocol('WM_DELETE_WINDOW',self.close)
         root.after(100,self.poll); root.after(300,self.startup)
 
     def build(self):
@@ -35,19 +36,23 @@ class App:
         ttk.Label(frame,text=t('war_title'),font=('',18,'bold')).grid(row=0,column=0,columnspan=3,sticky='w',pady=(0,10))
         ttk.Label(frame,text=t('war_auto_help'),wraplength=660,justify='left').grid(row=1,column=0,columnspan=3,sticky='w',pady=(0,15))
         ttk.Label(frame,textvariable=self.status,wraplength=660,font=('',12)).grid(row=2,column=0,columnspan=3,sticky='w',pady=10)
-        buttons=ttk.Frame(frame); buttons.grid(row=3,column=0,columnspan=3,sticky='w',pady=8)
+        ttk.Label(frame,textvariable=self.discovery,wraplength=660).grid(row=3,column=0,columnspan=3,sticky='w',pady=3)
+        buttons=ttk.Frame(frame); buttons.grid(row=4,column=0,columnspan=3,sticky='w',pady=8)
         self.connect_button=ttk.Button(buttons,text=t('war_connect'),command=self.connect); self.connect_button.pack(side='left',padx=(0,8))
         self.stop_button=ttk.Button(buttons,text=t('war_disconnect'),command=self.disconnect); self.stop_button.pack(side='left')
-        ttk.Separator(frame).grid(row=4,column=0,columnspan=3,sticky='ew',pady=12)
-        ttk.Label(frame,text=t('war_exe')).grid(row=5,column=0,sticky='w')
-        ttk.Entry(frame,textvariable=self.path).grid(row=5,column=1,sticky='ew',padx=8)
-        ttk.Button(frame,text=t('war_browse'),command=self.browse).grid(row=5,column=2)
-        ttk.Button(frame,text=t('war_launch'),command=self.launch).grid(row=6,column=1,sticky='w',padx=8,pady=12)
-        ttk.Label(frame,text=t('war_setup_note'),wraplength=660,justify='left').grid(row=7,column=0,columnspan=3,sticky='w',pady=8)
+        ttk.Button(buttons,text=t('war_copy_diag'),command=self.copy_diagnostics).pack(side='left',padx=8)
+        ttk.Separator(frame).grid(row=5,column=0,columnspan=3,sticky='ew',pady=12)
+        ttk.Label(frame,text=t('war_exe')).grid(row=6,column=0,sticky='w')
+        ttk.Entry(frame,textvariable=self.path).grid(row=6,column=1,sticky='ew',padx=8)
+        ttk.Button(frame,text=t('war_browse'),command=self.browse).grid(row=6,column=2)
+        ttk.Button(frame,text=t('war_launch'),command=self.launch).grid(row=7,column=1,sticky='w',padx=8,pady=12)
+        ttk.Label(frame,text=t('war_setup_note'),wraplength=660,justify='left').grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
         frame.columnconfigure(1,weight=1); self.update_buttons()
 
     def set_status(self,key,**kwargs): self.status_key=(key,kwargs); self.status.set(self.tr(key,**kwargs))
-    def set_language(self,code): self.tr=Translator(code); self.save(); self.build(); self.set_status(self.status_key[0],**self.status_key[1])
+    def set_discovery(self,key,**kwargs): self.discovery_key=(key,kwargs); self.discovery.set(self.tr(key,**kwargs))
+    def set_language(self,code):
+        self.tr=Translator(code); self.save(); self.build(); self.set_status(self.status_key[0],**self.status_key[1]); self.set_discovery(self.discovery_key[0],**self.discovery_key[1])
     def set_theme(self,theme): self.theme=theme; self.save(); self.build()
     def save(self):
         self.settings.update({'language':self.tr.code,'theme':self.theme,'server_host':self.server_host,'server_port':self.server_port,'fingerprint':self.fingerprint,'host_mode':self.host_mode,'path':self.path.get()})
@@ -105,8 +110,8 @@ class App:
     def connect(self):
         if self.client or self.connecting: return
         if not self.server_host or not re.fullmatch('[0-9a-f]{64}',self.fingerprint): self.open_settings(); return
-        self.retry_enabled=True; self.connecting=True; self.generation+=1; generation=self.generation
-        self.set_status('war_connecting'); self.update_buttons()
+        self.retry_enabled=True; self.connecting=True; self.remote_count=0; self.generation+=1; generation=self.generation
+        self.set_status('war_connecting'); self.set_discovery('war_local_search'); self.update_buttons()
         def worker():
             candidate=LobbyClient(self.server_host,self.server_port,self.fingerprint,lambda kind,info:self.events.put((generation,kind,info)))
             try: candidate.start(); self.events.put((generation,'client_ready',candidate))
@@ -116,7 +121,7 @@ class App:
     def disconnect(self):
         self.retry_enabled=False; self.generation+=1; self.connecting=False
         if self.client: self.client.stop(); self.client=None
-        self.set_status('war_offline'); self.update_buttons()
+        self.set_status('war_offline'); self.set_discovery('war_local_offline'); self.update_buttons()
 
     def shutdown_network(self):
         self.disconnect()
@@ -135,8 +140,11 @@ class App:
                 if generation != self.generation:
                     if kind=='client_ready': info.stop()
                     continue
-                if kind=='client_ready': self.connecting=False; self.client=info; self.set_status('war_online',count=0); self.update_buttons()
-                elif kind=='lobbies': self.set_status('war_online',count=info)
+                if kind=='client_ready': self.connecting=False; self.client=info; self.set_status('war_online',count=self.remote_count); self.update_buttons()
+                elif kind=='lobbies': self.remote_count=info; self.set_status('war_online',count=info)
+                elif kind=='local_found': self.set_discovery('war_local_found',name=info)
+                elif kind=='local_lost': self.set_discovery('war_local_search')
+                elif kind=='scan_stats': self.scan_stats=info
                 elif kind=='game_connected': self.set_status('war_game_connected')
                 elif kind in ('connect_error','error'):
                     self.connecting=False
@@ -146,6 +154,14 @@ class App:
                 elif kind=='relay_error': self.set_status('war_connection_error',error=info)
         except queue.Empty: pass
         self.root.after(100,self.poll)
+
+    def copy_diagnostics(self):
+        stats=self.client.snapshot() if self.client else self.scan_stats
+        text=(f"War3 Battle Platform 1.0.2\n{self.status.get()}\n{self.discovery.get()}\n"
+              f"UDP queries: {stats['queries']}; local replies: {stats['responses']}; "
+              f"accepted: {stats['accepted']}; rejected: {stats['rejected']}; last local source port: {stats['last_source_port']}")
+        self.root.clipboard_clear(); self.root.clipboard_append(text)
+        messagebox.showinfo(self.tr('war_copy_diag'),self.tr('war_diag_copied'),parent=self.root)
 
     def browse(self):
         path=filedialog.askopenfilename(parent=self.root,filetypes=[('Windows executable','*.exe')])

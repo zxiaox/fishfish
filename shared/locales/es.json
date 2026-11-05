@@ -110,5 +110,10 @@
   "war_connecting": "Conectando al servidor de salas…",
   "war_online": "Conectado. Salas remotas disponibles: {count}. Abre la lista LAN de Warcraft III.",
   "war_game_connected": "Conexión de juego establecida.",
-  "war_connection_error": "Problema de conexión: {error}"
+  "war_connection_error": "Problema de conexión: {error}",
+  "war_local_offline": "La búsqueda de partidas locales está detenida.",
+  "war_local_search": "Buscando una partida LAN creada en este equipo…",
+  "war_local_found": "Partida LAN local detectada: {name}.",
+  "war_copy_diag": "Copiar diagnóstico",
+  "war_diag_copied": "Diagnóstico copiado. Puedes pegarlo en tu mensaje de soporte."
 }
