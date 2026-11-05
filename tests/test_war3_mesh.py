@@ -17,8 +17,8 @@ spec = importlib.util.spec_from_file_location('war3_broker_mesh', Path('apps/war
 broker_module = importlib.util.module_from_spec(spec); spec.loader.exec_module(broker_module)
 
 
-def packet(port):
-    data = bytearray(b'\xf7\x30\0\0PX3W'+struct.pack('<III',26,42,0)+b'Lobby\0'+bytes(21)+struct.pack('<H',port))
+def packet(port, name=b'Lobby'):
+    data = bytearray(b'\xf7\x30\0\0PX3W'+struct.pack('<III',26,42,0)+name+b'\0'+bytes(21)+struct.pack('<H',port))
     struct.pack_into('<H',data,2,len(data)); return bytes(data)
 
 
@@ -51,13 +51,13 @@ class MeshTests(unittest.IsolatedAsyncioTestCase):
         host_udp=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); host_udp.bind(('127.0.0.1',0)); host_udp.settimeout(.2)
         game_tcp=socket.socket(socket.AF_INET,socket.SOCK_STREAM); game_tcp.bind(('127.0.0.1',0)); game_tcp.listen(); game_tcp.settimeout(5)
         viewer=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); viewer.bind(('127.0.0.1',0)); viewer.settimeout(8)
-        stop=threading.Event(); failures=queue.Queue()
+        stop=threading.Event(); failures=queue.Queue(); game_name='游戏房间'.encode('gb18030')
         def game_host():
             try:
                 while not stop.is_set():
                     try: data,addr=host_udp.recvfrom(1024)
                     except socket.timeout: continue
-                    if data[4:8]==b'PX3W' and data[8:12]==struct.pack('<I',26): host_udp.sendto(packet(game_tcp.getsockname()[1]),addr)
+                    if data[4:8]==b'PX3W' and data[8:12]==struct.pack('<I',26): host_udp.sendto(packet(game_tcp.getsockname()[1], game_name),addr)
             except OSError: pass
         def game_stream():
             try:
@@ -72,7 +72,8 @@ class MeshTests(unittest.IsolatedAsyncioTestCase):
         try:
             await asyncio.to_thread(first.start); await asyncio.to_thread(second.start)
             data,_=await asyncio.to_thread(viewer.recvfrom,2048)
-            self.assertEqual(data[1],0x30); port=struct.unpack_from('<H',data,len(data)-2)[0]
+            self.assertEqual(data[1],0x30); self.assertEqual(data[20:data.index(b'\0',20)],game_name)
+            port=struct.unpack_from('<H',data,len(data)-2)[0]
             def play():
                 with socket.create_connection(('127.0.0.1',port),timeout=5) as client:
                     client.sendall(b'war3-request'); return client.recv(1024)

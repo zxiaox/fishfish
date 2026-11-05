@@ -62,7 +62,9 @@ class App:
     def set_status(self,key,**kwargs): self.status_key=(key,kwargs); self.status.set(self.tr(key,**kwargs))
     def set_discovery(self,key,**kwargs): self.discovery_key=(key,kwargs); self.discovery.set(self.tr(key,**kwargs))
     def set_language(self,code):
-        self.tr=Translator(code); self.save(); self.build(); self.set_status(self.status_key[0],**self.status_key[1]); self.set_discovery(self.discovery_key[0],**self.discovery_key[1])
+        self.tr=Translator(code)
+        if self.client: self.client.language=code
+        self.save(); self.build(); self.set_status(self.status_key[0],**self.status_key[1]); self.set_discovery(self.discovery_key[0],**self.discovery_key[1])
     def set_theme(self,theme): self.theme=theme; self.save(); self.build()
     def apply_profile(self, mode):
         profile=self.profiles[mode]
@@ -169,7 +171,7 @@ class App:
         self.retry_enabled=True; self.connecting=True; self.reset_session(); self.generation+=1; generation=self.generation
         self.set_status('war_connecting'); self.update_buttons()
         def worker():
-            candidate=LobbyClient(self.server_host,self.server_port,self.fingerprint,lambda kind,info:self.events.put((generation,kind,info)))
+            candidate=LobbyClient(self.server_host,self.server_port,self.fingerprint,lambda kind,info:self.events.put((generation,kind,info)),language=self.tr.code)
             try: candidate.start(); self.events.put((generation,'client_ready',candidate))
             except Exception as exc: candidate.stop(); self.events.put((generation,'connect_error',str(exc)))
         threading.Thread(target=worker,daemon=True).start()

@@ -7,7 +7,7 @@ description: Build, update, package, or release FishFish desktop mini-apps with 
 
 For every FishFish app development or update task, read and apply this skill. Reuse `apps/`, `shared/`, and `packaging/` and keep business logic independent of the desktop toolkit and OS where practical. Windows is the supported release platform until macOS packaging and updater behavior are implemented and tested.
 
-- Provide English, Simplified Chinese, Korean, Japanese, Thai, German, and Spanish through `shared/locales/`. Localize user-visible messages, preserve placeholders, and test translations.
+- Provide English, Simplified Chinese, Korean, Japanese, Thai, German, and Spanish through `shared/locales/`. Localize user-visible messages, preserve placeholders, and test translations. For LAN games, test multilingual lobby names and representative legacy encodings, verify protocol bytes are preserved, and distinguish simulated coverage from real-game tests.
 - Center application-owned dialogs, including update prompts, relative to the main application window using `shared/dialogs.py`. Let native file pickers follow platform behavior.
 - Put settings, including language, theme, and update checking, in the top-left Settings menu using `shared.common.settings_menu`; place app-specific configuration there too. Offer selectable light and dark themes, save the selection per app, and maintain readable contrast.
 - Give each app a distinctive icon; embed the same icon in its Windows executable and use it for the window and taskbar identity. Verify the built app on Windows, including taskbar pinning and restart, when a Windows desktop is available.

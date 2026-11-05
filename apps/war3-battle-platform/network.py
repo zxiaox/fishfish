@@ -21,7 +21,31 @@ def search_packet(game, version):
     return b'\xf7\x2f\x10\x00' + (b'PX3W' if game == 'TFT' else b'3RAW') + struct.pack('<II', version, 0)
 
 
-def parse_announcement(data, game, version):
+def decode_game_name(raw_name, language=None):
+    """Decode a display label while leaving the game packet unchanged.
+
+    Classic clients may use their local legacy code page. A label cannot reveal
+    its encoding reliably, so the selected UI language is only a best-effort hint.
+    """
+    legacy = {'zh':'gb18030', 'ja':'cp932', 'ko':'cp949', 'th':'cp874',
+              'de':'cp1252', 'es':'cp1252'}
+    encodings = ['utf-8']
+    if language in legacy: encodings.append(legacy[language])
+    if sys.platform == 'win32':
+        import ctypes
+        if ctypes.windll.kernel32.GetACP() in (932, 949, 950): encodings.append('mbcs')
+    encodings.extend(('gb18030', 'mbcs'))
+    for encoding in dict.fromkeys(encodings):
+        try:
+            name = raw_name.decode(encoding)[:128]
+            if '\ufffd' in name: continue
+            return name
+        except (UnicodeDecodeError, LookupError):
+            continue
+    return raw_name.decode('utf-8', errors='replace')[:128]
+
+
+def parse_announcement(data, game, version, language=None):
     if len(data) < 44 or len(data) > MAX_PACKET or data[:2] != b'\xf7\x30':
         raise ValueError('Invalid game announcement')
     if struct.unpack_from('<H', data, 2)[0] != len(data):
@@ -34,20 +58,7 @@ def parse_announcement(data, game, version):
     if not port: raise ValueError('Invalid game port')
     game_id = struct.unpack_from('<I', data, 12)[0]
     raw_name = data[20:data.index(b'\0', 20)]
-    encodings = ['utf-8', 'gb18030', 'mbcs']
-    if sys.platform == 'win32':
-        import ctypes
-        if ctypes.windll.kernel32.GetACP() in (932, 949, 950):
-            encodings = ['utf-8', 'mbcs', 'gb18030']
-    for encoding in encodings:
-        try:
-            name = raw_name.decode(encoding)[:128]
-            if '\ufffd' in name: continue
-            break
-        except (UnicodeDecodeError, LookupError):
-            continue
-    else:
-        name = raw_name.decode('utf-8', errors='replace')[:128]
+    name = decode_game_name(raw_name, language)
     return game_id, port, name
 
 

@@ -72,8 +72,8 @@ def relay_pair(a, b, stop_event):
 
 
 class LobbyClient:
-    def __init__(self, host, port, fingerprint, callback, *, connection_factory=None, game_udp_port=LAN_PORT, broadcast_host='255.255.255.255', broadcast_port=LAN_PORT):
-        self.host=host; self.port=port; self.fingerprint=fingerprint; self.callback=callback
+    def __init__(self, host, port, fingerprint, callback, *, connection_factory=None, game_udp_port=LAN_PORT, broadcast_host='255.255.255.255', broadcast_port=LAN_PORT, language=None):
+        self.host=host; self.port=port; self.fingerprint=fingerprint; self.callback=callback; self.language=language
         self.connect_socket = connection_factory or (lambda: open_pinned(host, port, fingerprint))
         self.game_udp_port=game_udp_port; self.broadcast_host=broadcast_host; self.broadcast_port=broadcast_port
         self.stop_event=threading.Event(); self.send_lock=threading.Lock(); self.lock=threading.Lock()
@@ -155,7 +155,7 @@ class LobbyClient:
                     try:
                         if len(data) < 12: raise ValueError('short packet')
                         version=struct.unpack_from('<I',data,8)[0]; edition='TFT' if data[4:8]==b'PX3W' else 'ROC'
-                        game_id, game_port, name=parse_announcement(data,edition,version)
+                        game_id, game_port, name=parse_announcement(data,edition,version,self.language)
                     except ValueError:
                         with self.lock: self.stats['rejected'] += 1
                         continue
