@@ -2,7 +2,7 @@ name: Windows builds
 on:
   push:
     branches: [main]
-    tags: ['work-motivator-v*', 'monty-hall-v*']
+    tags: ['work-motivator-v*', 'monty-hall-v*', 'war3-battle-platform-v*']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        app: [work-motivator, monty-hall]
+        app: [work-motivator, monty-hall, war3-battle-platform]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -22,7 +22,7 @@ jobs:
       - run: python -m pip install pyinstaller==6.11.1
       - name: Build executable
         shell: pwsh
-        run: pyinstaller --noconfirm --clean --onefile --windowed --name "${{ matrix.app }}" --icon "assets/${{ matrix.app }}.ico" --paths . --add-data "shared/locales;shared/locales" --add-data "assets;assets" "apps/${{ matrix.app }}/main.py"
+        run: pyinstaller --noconfirm --clean --onefile --windowed --name "${{ matrix.app }}" --icon "assets/${{ matrix.app }}.ico" --paths . --add-data "shared/locales;shared/locales" --add-data "assets;assets" --add-data "THIRD-PARTY-NOTICES.txt;." "apps/${{ matrix.app }}/main.py"
       - name: Package portable ZIP and checksums
         shell: pwsh
         run: ./packaging/package-windows.ps1 -App "${{ matrix.app }}" -Executable "dist/${{ matrix.app }}.exe" -OutputDirectory dist
@@ -49,7 +49,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = '${{ github.ref_name }}'
-          if ($tag -notmatch '^(work-motivator|monty-hall)-v([0-9]+\.[0-9]+\.[0-9]+)$') { throw 'Invalid release tag' }
+          if ($tag -notmatch '^(work-motivator|monty-hall|war3-battle-platform)-v([0-9]+\.[0-9]+\.[0-9]+)$') { throw 'Invalid release tag' }
           $app = $Matches[1]
           $tagVersion = $Matches[2]
           $version = python -c "from shared.common import VERSIONS; print(VERSIONS['$app'])"

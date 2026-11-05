@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory=$true)][ValidateSet('work-motivator','monty-hall')][string]$App,
+  [Parameter(Mandatory=$true)][ValidateSet('work-motivator','monty-hall','war3-battle-platform')][string]$App,
   [Parameter(Mandatory=$true)][string]$Executable,
   [Parameter(Mandatory=$true)][string]$OutputDirectory
 )
@@ -12,6 +12,7 @@ $hash = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
 $bundle = Join-Path $OutputDirectory "$App-portable"
 New-Item -ItemType Directory -Force -Path $bundle | Out-Null
 Copy-Item $target, "$target.sha256" -Destination $bundle -Force
+if ($App -eq 'war3-battle-platform') { Copy-Item THIRD-PARTY-NOTICES.txt -Destination $bundle -Force }
 @"
 Extract this archive to a writable folder and launch $App.exe.
 Settings are stored separately in %APPDATA%\fishfish\$App.
