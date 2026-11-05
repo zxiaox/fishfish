@@ -115,5 +115,7 @@
   "war_local_search": "Buscando una partida LAN creada en este equipo…",
   "war_local_found": "Partida LAN local detectada: {name}.",
   "war_copy_diag": "Copiar diagnóstico",
-  "war_diag_copied": "Diagnóstico copiado. Puedes pegarlo en tu mensaje de soporte."
+  "war_diag_copied": "Diagnóstico copiado. Puedes pegarlo en tu mensaje de soporte.",
+  "war_local_published": "Partida local publicada en el servidor de salas: {name}.",
+  "war_publish_rejected": "El servidor rechazó el anuncio de la partida local. Copia el diagnóstico para soporte."
 }

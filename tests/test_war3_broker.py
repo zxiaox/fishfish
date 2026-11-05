@@ -43,9 +43,12 @@ class BrokerTests(unittest.IsolatedAsyncioTestCase):
         await self.send(hw, {'type':'hello'}); host = await self.receive(hr, 'welcome')
         await self.send(jw, {'type':'hello'}); await self.receive(jr, 'welcome')
         await self.send(hw, {'type':'publish', 'packet':packet()})
+        acknowledgement = await self.receive(hr, 'publish_ack')
+        self.assertEqual(acknowledgement['game_id'], 123)
         lobby = await self.receive(jr, 'lobbies')
         while not lobby['lobbies']: lobby = await self.receive(jr, 'lobbies')
         self.assertEqual(lobby['lobbies'][0]['host'], host['id'])
+        self.assertEqual(lobby['peers'], 2)
         await self.send(jw, {'type':'connect','host':host['id'],'request':'abc'})
         incoming = await self.receive(hr, 'incoming'); outgoing = await self.receive(jr, 'outgoing')
         host_data_r, host_data_w = await self.connection(); join_data_r, join_data_w = await self.connection()
@@ -59,6 +62,16 @@ class BrokerTests(unittest.IsolatedAsyncioTestCase):
         await self.send(hw, {'type':'withdraw'})
         change = await self.receive(jr,'lobbies')
         self.assertEqual(change['lobbies'], [])
+
+    async def test_bad_publication_is_reported_without_disconnect(self):
+        reader, writer = await self.connection()
+        await self.send(writer, {'type':'hello'})
+        welcome = await self.receive(reader, 'welcome')
+        self.assertTrue(welcome['server_id'])
+        await self.send(writer, {'type':'publish','packet':'invalid'})
+        await self.receive(reader, 'publish_rejected')
+        await self.send(writer, {'type':'ping'})
+        await self.receive(reader, 'pong')
 
     def test_advertisement_validation(self):
         self.assertIsNotNone(mod.packet_info(packet()))

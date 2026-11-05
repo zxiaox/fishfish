@@ -115,5 +115,7 @@
   "war_local_search": "Suche nach einem LAN-Spiel auf diesem Computer…",
   "war_local_found": "Lokales LAN-Spiel erkannt: {name}.",
   "war_copy_diag": "Diagnose kopieren",
-  "war_diag_copied": "Diagnose kopiert. Sie kann in eine Supportnachricht eingefügt werden."
+  "war_diag_copied": "Diagnose kopiert. Sie kann in eine Supportnachricht eingefügt werden.",
+  "war_local_published": "Lokales Spiel beim Lobbyserver veröffentlicht: {name}.",
+  "war_publish_rejected": "Der Lobbyserver hat die lokale Spielankündigung abgelehnt. Bitte Diagnose kopieren."
 }

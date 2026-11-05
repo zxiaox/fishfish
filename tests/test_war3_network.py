@@ -23,6 +23,9 @@ class WarcraftTests(unittest.TestCase):
         self.assertEqual(network.search_packet('TFT', 26), b'\xf7\x2f\x10\0PX3W\x1a\0\0\0\0\0\0\0')
         packet = announcement(6113)
         self.assertEqual(network.parse_announcement(packet, 'TFT', 26), (123, 6113, 'Test'))
+        raw_name='房间'.encode('gb18030')
+        chinese=bytearray(packet[:20] + raw_name + packet[24:]); struct.pack_into('<H',chinese,2,len(chinese))
+        self.assertEqual(network.parse_announcement(chinese, 'TFT', 26)[2], '房间')
         self.assertEqual(network.parse_announcement(network.rewrite_port(packet, 12345), 'TFT', 26)[1], 12345)
         for packet_bad in (packet[:10], packet[:-1], packet[:4] + b'BAD!' + packet[8:]):
             with self.assertRaises(ValueError): network.parse_announcement(packet_bad, 'TFT', 26)

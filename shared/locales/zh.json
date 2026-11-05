@@ -115,5 +115,7 @@
   "war_local_search": "正在搜索此电脑创建的局域网游戏…",
   "war_local_found": "已检测到本机局域网游戏：{name}。",
   "war_copy_diag": "复制诊断信息",
-  "war_diag_copied": "诊断信息已复制，可以粘贴到支持消息中。"
+  "war_diag_copied": "诊断信息已复制，可以粘贴到支持消息中。",
+  "war_local_published": "本机游戏已发布到大厅服务器：{name}。",
+  "war_publish_rejected": "大厅服务器拒绝了本机游戏公告。请复制诊断信息以便排查。"
 }

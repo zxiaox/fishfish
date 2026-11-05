@@ -115,5 +115,7 @@
   "war_local_search": "このPCでホストされているLANゲームを検索中…",
   "war_local_found": "ローカルLANゲームを検出: {name}。",
   "war_copy_diag": "診断情報をコピー",
-  "war_diag_copied": "診断情報をコピーしました。サポートメッセージに貼り付けられます。"
+  "war_diag_copied": "診断情報をコピーしました。サポートメッセージに貼り付けられます。",
+  "war_local_published": "ローカルゲームをロビーサーバーに公開しました: {name}。",
+  "war_publish_rejected": "ロビーサーバーがローカルゲームの通知を拒否しました。診断情報をコピーしてください。"
 }

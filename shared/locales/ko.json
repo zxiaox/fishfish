@@ -115,5 +115,7 @@
   "war_local_search": "이 컴퓨터에서 호스팅 중인 LAN 게임을 검색 중…",
   "war_local_found": "로컬 LAN 게임 발견: {name}.",
   "war_copy_diag": "진단 정보 복사",
-  "war_diag_copied": "진단 정보를 복사했습니다. 지원 메시지에 붙여 넣을 수 있습니다."
+  "war_diag_copied": "진단 정보를 복사했습니다. 지원 메시지에 붙여 넣을 수 있습니다.",
+  "war_local_published": "로컬 게임이 로비 서버에 등록되었습니다: {name}.",
+  "war_publish_rejected": "로비 서버가 로컬 게임 공지를 거부했습니다. 진단 정보를 복사해 주세요."
 }

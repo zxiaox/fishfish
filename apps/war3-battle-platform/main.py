@@ -22,7 +22,7 @@ class App:
         self.server_host=self.settings.get('server_host',''); self.server_port=self.settings.get('server_port',47653)
         self.fingerprint=self.settings.get('fingerprint',''); self.host_mode=self.settings.get('host_mode',False)
         self.path=tk.StringVar(value=self.settings.get('path','')); self.status=tk.StringVar(); self.status_key=('war_offline',{})
-        self.discovery=tk.StringVar(); self.discovery_key=('war_local_offline',{}); self.scan_stats={'queries':0,'responses':0,'accepted':0,'rejected':0,'last_source_port':0}; self.remote_count=0
+        self.discovery=tk.StringVar(); self.discovery_key=('war_local_offline',{}); self.scan_stats={'queries':0,'responses':0,'accepted':0,'rejected':0,'last_source_port':0,'game_version':0,'product':'','publish_sent':0,'publish_ack':0,'publish_rejected':0,'server_id':'unknown','peers':0}; self.remote_count=0; self.local_name=''
         self.events=queue.Queue(); self.client=None; self.server=None; self.generation=0; self.connecting=False; self.retry_enabled=True
         set_app_icon(root,APP); self.build(); self.set_status('war_offline'); self.set_discovery('war_local_offline'); root.protocol('WM_DELETE_WINDOW',self.close)
         root.after(100,self.poll); root.after(300,self.startup)
@@ -121,7 +121,7 @@ class App:
     def disconnect(self):
         self.retry_enabled=False; self.generation+=1; self.connecting=False
         if self.client: self.client.stop(); self.client=None
-        self.set_status('war_offline'); self.set_discovery('war_local_offline'); self.update_buttons()
+        self.local_name=''; self.set_status('war_offline'); self.set_discovery('war_local_offline'); self.update_buttons()
 
     def shutdown_network(self):
         self.disconnect()
@@ -142,8 +142,10 @@ class App:
                     continue
                 if kind=='client_ready': self.connecting=False; self.client=info; self.set_status('war_online',count=self.remote_count); self.update_buttons()
                 elif kind=='lobbies': self.remote_count=info; self.set_status('war_online',count=info)
-                elif kind=='local_found': self.set_discovery('war_local_found',name=info)
-                elif kind=='local_lost': self.set_discovery('war_local_search')
+                elif kind=='local_found': self.local_name=info; self.set_discovery('war_local_found',name=info)
+                elif kind=='published' and self.local_name: self.set_discovery('war_local_published',name=self.local_name)
+                elif kind=='publish_rejected': self.set_discovery('war_publish_rejected')
+                elif kind=='local_lost': self.local_name=''; self.set_discovery('war_local_search')
                 elif kind=='scan_stats': self.scan_stats=info
                 elif kind=='game_connected': self.set_status('war_game_connected')
                 elif kind in ('connect_error','error'):
@@ -157,9 +159,12 @@ class App:
 
     def copy_diagnostics(self):
         stats=self.client.snapshot() if self.client else self.scan_stats
-        text=(f"War3 Battle Platform 1.0.2\n{self.status.get()}\n{self.discovery.get()}\n"
+        text=(f"War3 Battle Platform 1.0.3\n{self.status.get()}\n{self.discovery.get()}\n"
               f"UDP queries: {stats['queries']}; local replies: {stats['responses']}; "
-              f"accepted: {stats['accepted']}; rejected: {stats['rejected']}; last local source port: {stats['last_source_port']}")
+              f"accepted: {stats['accepted']}; rejected: {stats['rejected']}; last local source port: {stats['last_source_port']}\n"
+              f"Server ID: {stats['server_id']}; connected peers: {stats['peers']}; "
+              f"product: {stats['product']}; protocol version: {stats['game_version']}\n"
+              f"Publications sent: {stats['publish_sent']}; acknowledged: {stats['publish_ack']}; server rejected: {stats['publish_rejected']}")
         self.root.clipboard_clear(); self.root.clipboard_append(text)
         messagebox.showinfo(self.tr('war_copy_diag'),self.tr('war_diag_copied'),parent=self.root)
 

@@ -32,7 +32,14 @@ def parse_announcement(data, game, version):
     port = struct.unpack_from('<H', data, len(data)-2)[0]
     if not port: raise ValueError('Invalid game port')
     game_id = struct.unpack_from('<I', data, 12)[0]
-    name = data[20:data.index(b'\0', 20)].decode('utf-8', errors='replace')[:128]
+    raw_name = data[20:data.index(b'\0', 20)]
+    for encoding in ('utf-8', 'mbcs', 'gb18030'):
+        try:
+            name = raw_name.decode(encoding)[:128]; break
+        except (UnicodeDecodeError, LookupError):
+            continue
+    else:
+        name = raw_name.decode('utf-8', errors='replace')[:128]
     return game_id, port, name
 
 

@@ -115,5 +115,7 @@
   "war_local_search": "Searching this computer for a hosted LAN game…",
   "war_local_found": "Local LAN game detected: {name}.",
   "war_copy_diag": "Copy diagnostics",
-  "war_diag_copied": "Diagnostics copied. You can paste them into your support message."
+  "war_diag_copied": "Diagnostics copied. You can paste them into your support message.",
+  "war_local_published": "Local game published to the lobby server: {name}.",
+  "war_publish_rejected": "The lobby server rejected the local game announcement. Copy diagnostics for support."
 }

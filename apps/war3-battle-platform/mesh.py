@@ -79,12 +79,14 @@ class LobbyClient:
         self.stop_event=threading.Event(); self.send_lock=threading.Lock(); self.lock=threading.Lock()
         self.control=None; self.udp=None; self.lobbies={}; self.pending={}; self.active=set(); self.threads=[]; self.local_port=None; self.last_local=0
         self.local_addresses=_local_addresses()
-        self.stats={'queries':0, 'responses':0, 'accepted':0, 'rejected':0, 'last_source_port':0}
+        self.stats={'queries':0, 'responses':0, 'accepted':0, 'rejected':0, 'last_source_port':0, 'game_version':0, 'product':'', 'publish_sent':0, 'publish_ack':0, 'publish_rejected':0, 'server_id':'unknown', 'peers':0}
 
     def start(self):
         self.control=self.connect_socket(); self.control.settimeout(8)
         send_json(self.control, {'type':'hello'})
-        if read_json(self.control).get('type') != 'welcome': raise ValueError('Server rejected connection')
+        welcome=read_json(self.control)
+        if welcome.get('type') != 'welcome': raise ValueError('Server rejected connection')
+        with self.lock: self.stats['server_id']=welcome.get('server_id','unknown')
         self.control.settimeout(1)
         self.udp=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); self.udp.bind(('0.0.0.0',0)); self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1); self.udp.settimeout(.3)
         self.local_addresses.add('127.0.0.1')
@@ -103,7 +105,15 @@ class LobbyClient:
                 try: msg=read_json(self.control, buffer)
                 except socket.timeout: continue
                 kind=msg.get('type')
-                if kind=='lobbies': self._set_lobbies(msg.get('lobbies', []))
+                if kind=='lobbies':
+                    with self.lock: self.stats['peers']=msg.get('peers',0)
+                    self._set_lobbies(msg.get('lobbies', []))
+                elif kind=='publish_ack':
+                    with self.lock: self.stats['publish_ack']+=1
+                    self.callback('published','')
+                elif kind=='publish_rejected':
+                    with self.lock: self.stats['publish_rejected']+=1
+                    self.callback('publish_rejected','')
                 elif kind=='incoming': self._spawn(self._host_relay,msg)
                 elif kind=='outgoing': self._spawn(self._join_relay,msg)
                 elif kind=='unavailable':
@@ -148,11 +158,13 @@ class LobbyClient:
                         continue
                     with self.lock:
                         self.local_port=game_port; self.local_game_address=addr[0]; self.stats['accepted'] += 1
+                        self.stats['game_version']=version; self.stats['product']=data[4:8].decode('ascii',errors='replace')
                     if not last_published: self.callback('local_found', name)
                     self.last_local=time.monotonic()
                     encoded=base64.b64encode(data).decode('ascii')
                     if encoded != last_published:
                         self._send({'type':'publish','packet':encoded}); last_published=encoded
+                        with self.lock: self.stats['publish_sent']+=1
                 if last_published and time.monotonic()-self.last_local>10:
                     self._send({'type':'withdraw'}); last_published=None
                     with self.lock: self.local_port=None

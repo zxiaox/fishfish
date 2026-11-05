@@ -30,7 +30,7 @@ def packet_info(encoded):
 
 class Broker:
     def __init__(self):
-        self.peers = {}; self.tickets = {}; self.servers = []
+        self.peers = {}; self.tickets = {}; self.servers = []; self.instance_id = secrets.token_hex(6)
 
     async def start(self, host, port, ssl_context=None):
         server = await asyncio.start_server(self.handle, host, port, ssl=ssl_context, limit=MAX_LINE, ssl_handshake_timeout=10 if ssl_context else None)
@@ -44,7 +44,7 @@ class Broker:
     async def broadcast(self):
         lobbies = [{'host': key, **p['advertisement']} for key, p in self.peers.items() if p['advertisement']]
         for key, peer in list(self.peers.items()):
-            try: await self.send(peer['writer'], {'type':'lobbies', 'lobbies':[entry for entry in lobbies if entry['host'] != key]})
+            try: await self.send(peer['writer'], {'type':'lobbies', 'lobbies':[entry for entry in lobbies if entry['host'] != key], 'peers':len(self.peers)})
             except (OSError, ConnectionError, asyncio.TimeoutError): peer['writer'].close()
 
     async def handle(self, reader, writer):
@@ -55,7 +55,7 @@ class Broker:
                 if len(self.peers) >= MAX_PEERS: return
                 peer_id = secrets.token_hex(16)
                 self.peers[peer_id] = {'writer':writer, 'advertisement':None}
-                await self.send(writer, {'type':'welcome', 'id':peer_id})
+                await self.send(writer, {'type':'welcome', 'id':peer_id, 'server_id':self.instance_id})
                 await self.broadcast()
                 await self.peer_loop(peer_id, reader, writer)
             elif first.get('type') == 'attach':
@@ -84,9 +84,11 @@ class Broker:
                 await self.send(writer, {'type':'pong'})
             elif msg.get('type') == 'publish':
                 ad = packet_info(msg.get('packet'))
-                if not ad: raise ValueError('Invalid advertisement')
+                if not ad:
+                    await self.send(writer, {'type':'publish_rejected'}); continue
                 if ad != peer['advertisement']:
                     peer['advertisement'] = ad; await self.broadcast()
+                await self.send(writer, {'type':'publish_ack', 'game_id':ad['game_id']})
             elif msg.get('type') == 'withdraw':
                 if peer['advertisement']:
                     peer['advertisement'] = None; await self.broadcast()
