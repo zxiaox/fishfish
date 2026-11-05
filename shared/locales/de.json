@@ -117,5 +117,16 @@
   "war_copy_diag": "Diagnose kopieren",
   "war_diag_copied": "Diagnose kopiert. Sie kann in eine Supportnachricht eingefügt werden.",
   "war_local_published": "Lokales Spiel beim Lobbyserver veröffentlicht: {name}.",
-  "war_publish_rejected": "Der Lobbyserver hat die lokale Spielankündigung abgelehnt. Bitte Diagnose kopieren."
+  "war_publish_rejected": "Der Lobbyserver hat die lokale Spielankündigung abgelehnt. Bitte Diagnose kopieren.",
+  "war_mode": "Verbindungsmodus",
+  "war_mode_direct": "Direkt / Portweiterleitung",
+  "war_mode_zerotier": "ZeroTier-Netzwerk",
+  "war_direct_help": "Direktmodus: Der Betreiber leitet den TCP-Port weiter und teilt öffentliche Adresse, Port und Fingerabdruck.",
+  "war_zt_help": "ZeroTier auf beiden PCs separat installieren, demselben Netzwerk beitreten und beide Geräte autorisieren. Der Betreiber teilt seine ZeroTier-IPv4, den Port und Fingerabdruck. Die Prüfung zeigt nur lokale Adapteradressen.",
+  "war_zt_main_help": "ZeroTier auf beiden PCs installieren und beide im selben Netzwerk autorisieren. Der Betreiber teilt ZeroTier-IPv4, Port und Fingerabdruck.",
+  "war_zt_check": "Lokale ZeroTier-IPv4 prüfen",
+  "war_zt_unchecked": "Nicht geprüft",
+  "war_zt_checking": "Prüfung läuft…",
+  "war_zt_error": "Netzwerkadapter konnten nicht geprüft werden",
+  "war_zt_none": "Keine aktive ZeroTier-IPv4 gefunden"
 }

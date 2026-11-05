@@ -117,5 +117,16 @@
   "war_copy_diag": "診断情報をコピー",
   "war_diag_copied": "診断情報をコピーしました。サポートメッセージに貼り付けられます。",
   "war_local_published": "ローカルゲームをロビーサーバーに公開しました: {name}。",
-  "war_publish_rejected": "ロビーサーバーがローカルゲームの通知を拒否しました。診断情報をコピーしてください。"
+  "war_publish_rejected": "ロビーサーバーがローカルゲームの通知を拒否しました。診断情報をコピーしてください。",
+  "war_mode": "接続モード",
+  "war_mode_direct": "直接接続 / ポート転送",
+  "war_mode_zerotier": "ZeroTier ネットワーク",
+  "war_direct_help": "直接接続では、サーバー運営者がTCPポートを転送し、公開アドレス、ポート、指紋を共有します。",
+  "war_zt_help": "両PCにZeroTierを別途インストールし、同じネットワークに参加して承認を受けます。サーバー運営者がZeroTier IPv4、ポート、指紋を共有します。確認機能はローカルアダプターのアドレスのみ表示します。",
+  "war_zt_main_help": "両PCでZeroTierをインストールし、同じネットワークに参加して承認を受けます。運営者はZeroTier IPv4、ポート、指紋を共有します。",
+  "war_zt_check": "ローカルZeroTier IPv4を確認",
+  "war_zt_unchecked": "未確認",
+  "war_zt_checking": "確認中…",
+  "war_zt_error": "ネットワークアダプターを確認できません",
+  "war_zt_none": "有効なZeroTier IPv4が見つかりません"
 }

@@ -88,6 +88,9 @@ class LobbyClient:
         if welcome.get('type') != 'welcome': raise ValueError('Server rejected connection')
         with self.lock: self.stats['server_id']=welcome.get('server_id','unknown')
         self.control.settimeout(1)
+        # Include the source address of the selected route, including a virtual adapter.
+        local_ip = self.control.getsockname()[0]
+        if local_ip and local_ip != '0.0.0.0': self.local_addresses.add(local_ip)
         self.udp=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); self.udp.bind(('0.0.0.0',0)); self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1); self.udp.settimeout(.3)
         self.local_addresses.add('127.0.0.1')
         for fn in (self._control_loop, self._local_loop):

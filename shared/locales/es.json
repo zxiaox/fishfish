@@ -117,5 +117,16 @@
   "war_copy_diag": "Copiar diagnóstico",
   "war_diag_copied": "Diagnóstico copiado. Puedes pegarlo en tu mensaje de soporte.",
   "war_local_published": "Partida local publicada en el servidor de salas: {name}.",
-  "war_publish_rejected": "El servidor rechazó el anuncio de la partida local. Copia el diagnóstico para soporte."
+  "war_publish_rejected": "El servidor rechazó el anuncio de la partida local. Copia el diagnóstico para soporte.",
+  "war_mode": "Modo de conexión",
+  "war_mode_direct": "Directo / redirección de puerto",
+  "war_mode_zerotier": "Red ZeroTier",
+  "war_direct_help": "Modo directo: el administrador redirige el puerto TCP y comparte la dirección pública, el puerto y la huella.",
+  "war_zt_help": "Instala ZeroTier por separado en ambos equipos; únelos y autorízalos en la misma red. El administrador comparte su IPv4 de ZeroTier, puerto y huella. La comprobación solo muestra direcciones del adaptador local.",
+  "war_zt_main_help": "Instala ZeroTier en ambos equipos y autorízalos en la misma red. El administrador comparte su IPv4 de ZeroTier, puerto y huella.",
+  "war_zt_check": "Comprobar IPv4 local de ZeroTier",
+  "war_zt_unchecked": "Sin comprobar",
+  "war_zt_checking": "Comprobando…",
+  "war_zt_error": "No se pudieron inspeccionar los adaptadores de red",
+  "war_zt_none": "No se encontró una IPv4 activa de ZeroTier"
 }

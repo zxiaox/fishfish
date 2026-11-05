@@ -117,5 +117,16 @@
   "war_copy_diag": "Copy diagnostics",
   "war_diag_copied": "Diagnostics copied. You can paste them into your support message.",
   "war_local_published": "Local game published to the lobby server: {name}.",
-  "war_publish_rejected": "The lobby server rejected the local game announcement. Copy diagnostics for support."
+  "war_publish_rejected": "The lobby server rejected the local game announcement. Copy diagnostics for support.",
+  "war_mode": "Connection mode",
+  "war_mode_direct": "Direct / port forwarding",
+  "war_mode_zerotier": "ZeroTier network",
+  "war_direct_help": "Direct mode: the operator forwards the server TCP port and shares the public address, port, and fingerprint.",
+  "war_zt_help": "Install ZeroTier separately on both PCs, join and authorize the same network. The server operator shares their ZeroTier IPv4, port, and fingerprint. The check shows local adapter addresses only.",
+  "war_zt_main_help": "ZeroTier must be installed and both computers joined and authorized on the same network. The host shares their ZeroTier IPv4, server port, and fingerprint.",
+  "war_zt_check": "Check local ZeroTier IPv4",
+  "war_zt_unchecked": "Not checked",
+  "war_zt_checking": "Checking…",
+  "war_zt_error": "Could not inspect network adapters",
+  "war_zt_none": "No active ZeroTier IPv4 found"
 }

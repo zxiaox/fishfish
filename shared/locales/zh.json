@@ -117,5 +117,16 @@
   "war_copy_diag": "复制诊断信息",
   "war_diag_copied": "诊断信息已复制，可以粘贴到支持消息中。",
   "war_local_published": "本机游戏已发布到大厅服务器：{name}。",
-  "war_publish_rejected": "大厅服务器拒绝了本机游戏公告。请复制诊断信息以便排查。"
+  "war_publish_rejected": "大厅服务器拒绝了本机游戏公告。请复制诊断信息以便排查。",
+  "war_mode": "连接模式",
+  "war_mode_direct": "直连 / 端口映射",
+  "war_mode_zerotier": "ZeroTier 虚拟网络",
+  "war_direct_help": "直连模式：服务器运行者需要转发服务器 TCP 端口，并分享公网地址、端口和指纹。",
+  "war_zt_help": "两台电脑需分别安装 ZeroTier、加入同一网络并获得授权。服务器运行者分享自己的 ZeroTier IPv4、端口和指纹。检查功能仅显示本机网卡地址。",
+  "war_zt_main_help": "需在两台电脑安装 ZeroTier，加入同一网络并获得授权。服务器运行者分享其 ZeroTier IPv4、端口和指纹。",
+  "war_zt_check": "检查本机 ZeroTier IPv4",
+  "war_zt_unchecked": "尚未检查",
+  "war_zt_checking": "正在检查…",
+  "war_zt_error": "无法检查网络适配器",
+  "war_zt_none": "未找到活动的 ZeroTier IPv4"
 }

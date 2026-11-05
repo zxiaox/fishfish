@@ -117,5 +117,16 @@
   "war_copy_diag": "진단 정보 복사",
   "war_diag_copied": "진단 정보를 복사했습니다. 지원 메시지에 붙여 넣을 수 있습니다.",
   "war_local_published": "로컬 게임이 로비 서버에 등록되었습니다: {name}.",
-  "war_publish_rejected": "로비 서버가 로컬 게임 공지를 거부했습니다. 진단 정보를 복사해 주세요."
+  "war_publish_rejected": "로비 서버가 로컬 게임 공지를 거부했습니다. 진단 정보를 복사해 주세요.",
+  "war_mode": "연결 모드",
+  "war_mode_direct": "직접 연결 / 포트 전달",
+  "war_mode_zerotier": "ZeroTier 네트워크",
+  "war_direct_help": "직접 연결: 서버 운영자가 TCP 포트를 전달하고 공인 주소, 포트 및 지문을 공유합니다.",
+  "war_zt_help": "두 PC에 ZeroTier를 별도로 설치하고 같은 네트워크에 가입 및 승인받으세요. 서버 운영자가 ZeroTier IPv4, 포트와 지문을 공유합니다. 검사는 로컬 어댑터 주소만 표시합니다.",
+  "war_zt_main_help": "두 컴퓨터에 ZeroTier를 설치하고 같은 네트워크에 가입 및 승인받으세요. 서버 운영자가 ZeroTier IPv4, 포트와 지문을 공유합니다.",
+  "war_zt_check": "로컬 ZeroTier IPv4 확인",
+  "war_zt_unchecked": "확인하지 않음",
+  "war_zt_checking": "확인 중…",
+  "war_zt_error": "네트워크 어댑터를 확인할 수 없음",
+  "war_zt_none": "활성 ZeroTier IPv4를 찾지 못함"
 }

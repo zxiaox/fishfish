@@ -18,6 +18,29 @@ with tempfile.TemporaryDirectory() as directory:
     assert root.title() == app.tr('war_title')
     assert root['menu'], 'Settings menu missing'
     assert app.connect_button.winfo_exists()
+    assert app.connection_mode == 'direct'
+    app.server_host='example.test'; app.server_port=47653; app.fingerprint='a'*64; app.save()
+    app.open_settings()
+    def descendants(widget):
+        result=[]
+        for child in widget.winfo_children(): result.append(child); result.extend(descendants(child))
+        return result
+    radio=next(w for w in descendants(app.dialog) if isinstance(w, __import__('tkinter').ttk.Radiobutton) and w.cget('value') == 'zerotier')
+    radio.invoke()
+    assert app.dialog.winfo_exists()
+    entries=[w for w in descendants(app.dialog) if isinstance(w, __import__('tkinter').ttk.Entry)]
+    entries[0].delete(0,'end'); entries[0].insert(0,'10.147.17.2')
+    entries[2].delete(0,'end'); entries[2].insert(0,'b'*64)
+    app.connect=lambda: None
+    confirm=next(w for w in descendants(app.dialog) if isinstance(w, __import__('tkinter').ttk.Button) and w.cget('text') == app.tr('confirm'))
+    confirm.invoke()
+    assert app.connection_mode == 'zerotier', app.connection_mode
+    assert app.server_host == '10.147.17.2', app.server_host
+    assert app.profiles['direct']['server_host'] == 'example.test', app.profiles
+    stored=module.load_settings(module.APP)
+    assert stored['connection_mode'] == 'zerotier'
+    assert stored['connection_profiles']['direct']['server_host'] == 'example.test'
+    assert stored['connection_profiles']['zerotier']['server_host'] == '10.147.17.2'
     class FakeClient:
         def stop(self): pass
     # A lobby update may arrive before the worker's client-ready event.
