@@ -1,6 +1,7 @@
 """Client for a self-hosted War3 lobby directory and TCP relay."""
 import base64
 import hashlib
+import ipaddress
 import json
 import queue
 import select
@@ -90,7 +91,7 @@ class LobbyClient:
         self.control.settimeout(1)
         # Include the source address of the selected route, including a virtual adapter.
         local_ip = self.control.getsockname()[0]
-        if local_ip and local_ip != '0.0.0.0': self.local_addresses.add(local_ip)
+        if local_ip and ipaddress.ip_address(local_ip).version == 4 and local_ip != '0.0.0.0': self.local_addresses.add(local_ip)
         self.udp=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); self.udp.bind(('0.0.0.0',0)); self.udp.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1); self.udp.settimeout(.3)
         self.local_addresses.add('127.0.0.1')
         for fn in (self._control_loop, self._local_loop):

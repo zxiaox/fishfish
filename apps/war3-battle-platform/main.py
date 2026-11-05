@@ -13,7 +13,7 @@ from shared.dialogs import center_window
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from mesh import LobbyClient
 from server_host import HostedBroker, ensure_certificate
-from connection_modes import MODES, load_profiles, normalize_address, zerotier_ips
+from connection_modes import MODES, load_profiles, normalize_address, zerotier_ips, global_ipv6_addresses
 
 APP = 'war3-battle-platform'
 
@@ -32,6 +32,7 @@ class App:
         self.connection_mode=saved_mode if saved_mode in MODES else 'direct'
         self.apply_profile(self.connection_mode)
         self.path=tk.StringVar(value=self.settings.get('path','')); self.status=tk.StringVar(); self.status_key=('war_offline',{})
+        self.ipv6_status=tk.StringVar(); self.ipv6_key=None
         self.discovery=tk.StringVar(); self.discovery_key=('war_local_offline',{}); self.scan_stats=empty_scan_stats(); self.remote_count=0; self.local_name=''
         self.events=queue.Queue(); self.client=None; self.server=None; self.generation=0; self.server_generation=0; self.connecting=False; self.retry_enabled=True
         set_app_icon(root,APP); self.build(); self.set_status('war_offline'); self.set_discovery('war_local_offline'); root.protocol('WM_DELETE_WINDOW',self.close)
@@ -40,23 +41,24 @@ class App:
     def build(self):
         for widget in self.root.winfo_children(): widget.destroy()
         t=self.tr; self.root._fishfish_language=t.code; apply_theme(self.root,self.theme)
-        self.root.title(t('war_title')); self.root.geometry('720x500'); self.root.minsize(640,440)
+        self.root.title(t('war_title')); self.root.geometry('720x540'); self.root.minsize(640,440)
         settings_menu(self.root,t,self.theme,self.set_language,self.set_theme,lambda:check_updates(self.root,APP,self.tr),self.open_settings,t('war_config'))
         frame=ttk.Frame(self.root,padding=18); frame.pack(fill='both',expand=True)
         ttk.Label(frame,text=t('war_title'),font=('',18,'bold')).grid(row=0,column=0,columnspan=3,sticky='w',pady=(0,10))
         ttk.Label(frame,text=t('war_auto_help'),wraplength=660,justify='left').grid(row=1,column=0,columnspan=3,sticky='w',pady=(0,15))
         ttk.Label(frame,textvariable=self.status,wraplength=660,font=('',12)).grid(row=2,column=0,columnspan=3,sticky='w',pady=10)
         ttk.Label(frame,textvariable=self.discovery,wraplength=660).grid(row=3,column=0,columnspan=3,sticky='w',pady=3)
-        buttons=ttk.Frame(frame); buttons.grid(row=4,column=0,columnspan=3,sticky='w',pady=8)
+        ttk.Label(frame,textvariable=self.ipv6_status,wraplength=660).grid(row=4,column=0,columnspan=3,sticky='w')
+        buttons=ttk.Frame(frame); buttons.grid(row=5,column=0,columnspan=3,sticky='w',pady=8)
         self.connect_button=ttk.Button(buttons,text=t('war_connect'),command=self.connect); self.connect_button.pack(side='left',padx=(0,8))
         self.stop_button=ttk.Button(buttons,text=t('war_disconnect'),command=self.disconnect); self.stop_button.pack(side='left')
         ttk.Button(buttons,text=t('war_copy_diag'),command=self.copy_diagnostics).pack(side='left',padx=8)
-        ttk.Separator(frame).grid(row=5,column=0,columnspan=3,sticky='ew',pady=12)
-        ttk.Label(frame,text=t('war_exe')).grid(row=6,column=0,sticky='w')
-        ttk.Entry(frame,textvariable=self.path).grid(row=6,column=1,sticky='ew',padx=8)
-        ttk.Button(frame,text=t('war_browse'),command=self.browse).grid(row=6,column=2)
-        ttk.Button(frame,text=t('war_launch'),command=self.launch).grid(row=7,column=1,sticky='w',padx=8,pady=12)
-        ttk.Label(frame,text=t('war_zt_main_help' if self.connection_mode=='zerotier' else 'war_setup_note'),wraplength=660,justify='left').grid(row=8,column=0,columnspan=3,sticky='w',pady=8)
+        ttk.Separator(frame).grid(row=6,column=0,columnspan=3,sticky='ew',pady=12)
+        ttk.Label(frame,text=t('war_exe')).grid(row=7,column=0,sticky='w')
+        ttk.Entry(frame,textvariable=self.path).grid(row=7,column=1,sticky='ew',padx=8)
+        ttk.Button(frame,text=t('war_browse'),command=self.browse).grid(row=7,column=2)
+        ttk.Button(frame,text=t('war_launch'),command=self.launch).grid(row=8,column=1,sticky='w',padx=8,pady=12)
+        ttk.Label(frame,text=t('war_zt_main_help' if self.connection_mode=='zerotier' else 'war_setup_note'),wraplength=660,justify='left').grid(row=9,column=0,columnspan=3,sticky='w',pady=8)
         frame.columnconfigure(1,weight=1); self.update_buttons()
 
     def set_status(self,key,**kwargs): self.status_key=(key,kwargs); self.status.set(self.tr(key,**kwargs))
@@ -64,16 +66,16 @@ class App:
     def set_language(self,code):
         self.tr=Translator(code)
         if self.client: self.client.language=code
-        self.save(); self.build(); self.set_status(self.status_key[0],**self.status_key[1]); self.set_discovery(self.discovery_key[0],**self.discovery_key[1])
+        self.save(); self.build(); self.ipv6_status.set(self.tr(self.ipv6_key)) if self.ipv6_key else None; self.set_status(self.status_key[0],**self.status_key[1]); self.set_discovery(self.discovery_key[0],**self.discovery_key[1])
     def set_theme(self,theme): self.theme=theme; self.save(); self.build()
     def apply_profile(self, mode):
         profile=self.profiles[mode]
         self.server_host=profile['server_host']; self.server_port=profile['server_port']
-        self.fingerprint=profile['fingerprint']; self.host_mode=profile['host_mode']
+        self.fingerprint=profile['fingerprint']; self.host_mode=profile['host_mode']; self.ipv6_enabled=profile['ipv6_enabled']
 
     def current_profile(self):
         return {'server_host':self.server_host, 'server_port':self.server_port,
-                'fingerprint':self.fingerprint, 'host_mode':self.host_mode}
+                'fingerprint':self.fingerprint, 'host_mode':self.host_mode, 'ipv6_enabled':self.ipv6_enabled}
 
     def save(self):
         self.profiles[self.connection_mode]=self.current_profile()
@@ -100,17 +102,17 @@ class App:
         selected=tk.StringVar(value=self.connection_mode); previous=[self.connection_mode]
         profile=draft[self.connection_mode]
         host=tk.StringVar(value=profile['server_host']); port=tk.StringVar(value=str(profile['server_port']))
-        fingerprint=tk.StringVar(value=profile['fingerprint']); host_mode=tk.BooleanVar(value=profile['host_mode'])
+        fingerprint=tk.StringVar(value=profile['fingerprint']); host_mode=tk.BooleanVar(value=profile['host_mode']); ipv6_enabled=tk.BooleanVar(value=profile['ipv6_enabled'])
         help_text=tk.StringVar(); zt_status=tk.StringVar(value=t('war_zt_unchecked'))
         ttk.Label(frame,text=t('war_mode')).grid(row=0,column=0,sticky='w')
         choices=ttk.Frame(frame); choices.grid(row=0,column=1,sticky='w')
         def change_mode():
-            draft[previous[0]]={'server_host':host.get(), 'server_port':port.get(), 'fingerprint':fingerprint.get(), 'host_mode':host_mode.get()}
+            draft[previous[0]]={'server_host':host.get(), 'server_port':port.get(), 'fingerprint':fingerprint.get(), 'host_mode':host_mode.get(), 'ipv6_enabled':ipv6_enabled.get()}
             previous[0]=selected.get(); profile=draft[selected.get()]
-            host.set(profile['server_host']); port.set(str(profile['server_port'])); fingerprint.set(profile['fingerprint']); host_mode.set(profile['host_mode'])
+            host.set(profile['server_host']); port.set(str(profile['server_port'])); fingerprint.set(profile['fingerprint']); host_mode.set(profile['host_mode']); ipv6_enabled.set(profile['ipv6_enabled'])
             help_text.set(t('war_zt_help' if selected.get()=='zerotier' else 'war_direct_help'))
-            if selected.get()=='zerotier': zt_frame.grid()
-            else: zt_frame.grid_remove()
+            if selected.get()=='zerotier': zt_frame.grid(); ipv6_frame.grid_remove(); ipv6_check.grid_remove()
+            else: zt_frame.grid_remove(); ipv6_frame.grid(); ipv6_check.grid()
             dialog.update_idletasks()
         for key in MODES:
             ttk.Radiobutton(choices,text=t('war_mode_'+key),variable=selected,value=key,command=change_mode).pack(side='left',padx=(0,10))
@@ -132,7 +134,21 @@ class App:
                 self.events.put((self.generation,'zerotier_result',(dialog,zt_button,zt_status,result)))
             threading.Thread(target=work,daemon=True).start()
         zt_button.configure(command=check_zt)
-        ttk.Label(frame,textvariable=help_text,wraplength=520,justify='left').grid(row=7,columnspan=2,sticky='w',pady=8)
+        ipv6_frame=ttk.Frame(frame); ipv6_frame.grid(row=6,column=0,columnspan=2,sticky='ew',pady=4)
+        ipv6_status=tk.StringVar(value=t('war_ipv6_unchecked'))
+        ipv6_button=ttk.Button(ipv6_frame,text=t('war_ipv6_check')); ipv6_button.pack(side='left',padx=(0,8))
+        ttk.Entry(ipv6_frame,textvariable=ipv6_status,state='readonly',width=45).pack(side='left',fill='x',expand=True)
+        def check_ipv6():
+            ipv6_button.state(['disabled']); ipv6_status.set(t('war_ipv6_checking'))
+            def work():
+                try: result=(global_ipv6_addresses(),None)
+                except (OSError,ValueError,subprocess.SubprocessError) as exc: result=(None,str(exc))
+                self.events.put((self.generation,'ipv6_result',(dialog,ipv6_button,ipv6_status,result)))
+            threading.Thread(target=work,daemon=True).start()
+        ipv6_button.configure(command=check_ipv6)
+        ipv6_check=ttk.Checkbutton(frame,text=t('war_ipv6_enable'),variable=ipv6_enabled)
+        ipv6_check.grid(row=7,column=0,columnspan=2,sticky='w')
+        ttk.Label(frame,textvariable=help_text,wraplength=520,justify='left').grid(row=8,columnspan=2,sticky='w',pady=8)
         def confirm():
             try:
                 number=int(port.get())
@@ -146,21 +162,22 @@ class App:
                     if not re.fullmatch('[0-9a-f]{64}',pin): raise ValueError()
             except (OSError,ValueError):
                 messagebox.showerror(t('error'),t('war_config_error'),parent=dialog); return
-            draft[mode]={'server_host':server, 'server_port':number, 'fingerprint':pin, 'host_mode':is_host}
+            draft[mode]={'server_host':server, 'server_port':number, 'fingerprint':pin, 'host_mode':is_host, 'ipv6_enabled':ipv6_enabled.get()}
             self.shutdown_network(); self.profiles[mode]=draft[mode]; self.connection_mode=mode; self.apply_profile(mode); self.retry_enabled=True
             self.save(); dialog.destroy(); self.build()
             if self.host_mode: self.start_server()
             else: self.connect()
-        ttk.Button(frame,text=t('confirm'),command=confirm).grid(row=8,column=1,pady=6)
+        ttk.Button(frame,text=t('confirm'),command=confirm).grid(row=9,column=1,pady=6)
         help_text.set(t('war_zt_help' if selected.get()=='zerotier' else 'war_direct_help'))
         if selected.get()!='zerotier': zt_frame.grid_remove()
+        else: ipv6_frame.grid_remove(); ipv6_check.grid_remove()
         center_window(dialog,self.root)
 
     def start_server(self):
         if self.server: return
         try:
             self.server_generation+=1; server_generation=self.server_generation
-            self.server=HostedBroker(config_dir(APP)/'server',self.server_port,lambda kind,info:self.events.put((server_generation,kind,info)))
+            self.server=HostedBroker(config_dir(APP)/'server',self.server_port,lambda kind,info:self.events.put((server_generation,kind,info)),ipv6_enabled=self.ipv6_enabled and self.connection_mode=='direct')
             self.fingerprint=self.server.fingerprint; self.server_host='127.0.0.1'; self.save(); self.set_status('war_server_starting'); self.server.start()
         except (OSError,ValueError) as exc:
             self.server=None; self.set_status('war_server_failed',error=str(exc))
@@ -187,7 +204,7 @@ class App:
 
     def shutdown_network(self):
         self.disconnect()
-        self.server_generation+=1
+        self.server_generation+=1; self.ipv6_key=None; self.ipv6_status.set('')
         server=self.server; self.server=None
         if server: server.stop()
 
@@ -195,16 +212,19 @@ class App:
         try:
             while True:
                 generation,kind,info=self.events.get_nowait()
-                if kind=='zerotier_result':
+                if kind in ('zerotier_result','ipv6_result'):
                     dialog,button,status,result=info
                     if dialog.winfo_exists():
                         button.state(['!disabled']); addresses,error=result
-                        status.set(self.tr('war_zt_error') if error else ', '.join(addresses) if addresses else self.tr('war_zt_none'))
+                        prefix='war_zt_' if kind=='zerotier_result' else 'war_ipv6_'
+                        status.set(self.tr(prefix+'error') if error else ', '.join(addresses) if addresses else self.tr(prefix+'none'))
                     continue
                 if kind.startswith('server_'):
                     if not self.server or generation != self.server_generation: continue
                     if kind=='server_ready':
-                        self.fingerprint=info; self.server_host='127.0.0.1'; self.save(); self.connect()
+                        self.fingerprint=info['fingerprint']; self.server_host='127.0.0.1'
+                        self.ipv6_key=('war_ipv6_listening' if info['ipv6_active'] else 'war_ipv6_unavailable') if info['ipv6_requested'] else None
+                        self.ipv6_status.set(self.tr(self.ipv6_key) if self.ipv6_key else ''); self.save(); self.connect()
                     elif kind=='server_error': self.server=None; self.set_status('war_server_failed',error=info)
                     continue
                 if generation != self.generation:

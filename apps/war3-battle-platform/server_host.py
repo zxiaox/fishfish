@@ -2,7 +2,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 import hashlib
-import ipaddress
+import socket
 from pathlib import Path
 import ssl
 import threading
@@ -38,8 +38,8 @@ def ensure_certificate(directory):
 
 
 class HostedBroker:
-    def __init__(self,directory,port,callback):
-        self.cert,self.key,self.fingerprint=ensure_certificate(directory); self.port=port; self.callback=callback
+    def __init__(self,directory,port,callback,ipv6_enabled=False):
+        self.cert,self.key,self.fingerprint=ensure_certificate(directory); self.port=port; self.callback=callback; self.ipv6_enabled=ipv6_enabled
         self.loop=None; self.broker=None; self.thread=None
     def start(self):
         self.thread=threading.Thread(target=self._run,daemon=True); self.thread.start()
@@ -49,8 +49,21 @@ class HostedBroker:
             try:
                 ctx=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER); ctx.load_cert_chain(self.cert,self.key)
                 self.broker=Broker(); server=await self.broker.start('0.0.0.0',self.port,ctx)
-                self.callback('server_ready',self.fingerprint)
-                async with server: await server.serve_forever()
+                servers=[server]; ipv6_active=False; ipv6_error=''
+                if self.ipv6_enabled:
+                    ipv6_socket=None
+                    try:
+                        ipv6_socket=socket.socket(socket.AF_INET6,socket.SOCK_STREAM)
+                        ipv6_socket.setsockopt(socket.IPPROTO_IPV6,socket.IPV6_V6ONLY,1)
+                        ipv6_socket.setblocking(False)
+                        ipv6_socket.bind(('::',server.sockets[0].getsockname()[1])); ipv6_socket.listen(socket.SOMAXCONN)
+                        ipv6_server=await self.broker.start(None,None,ctx,sock=ipv6_socket)
+                        servers.append(ipv6_server); ipv6_active=True
+                    except OSError as exc:
+                        if ipv6_socket: ipv6_socket.close()
+                        ipv6_error=str(exc)
+                self.callback('server_ready',{'fingerprint':self.fingerprint, 'ipv6_active':ipv6_active, 'ipv6_requested':self.ipv6_enabled, 'ipv6_error':ipv6_error, 'port':server.sockets[0].getsockname()[1]})
+                await asyncio.gather(*(item.serve_forever() for item in servers))
             except asyncio.CancelledError: pass
             except Exception as exc: self.callback('server_error',str(exc))
             finally:

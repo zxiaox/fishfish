@@ -32,8 +32,9 @@ class Broker:
     def __init__(self):
         self.peers = {}; self.tickets = {}; self.servers = []; self.instance_id = secrets.token_hex(6)
 
-    async def start(self, host, port, ssl_context=None):
-        server = await asyncio.start_server(self.handle, host, port, ssl=ssl_context, limit=MAX_LINE, ssl_handshake_timeout=10 if ssl_context else None)
+    async def start(self, host, port, ssl_context=None, *, sock=None):
+        args = {'sock':sock} if sock is not None else {'host':host, 'port':port}
+        server = await asyncio.start_server(self.handle, **args, ssl=ssl_context, limit=MAX_LINE, ssl_handshake_timeout=10 if ssl_context else None)
         self.servers.append(server); return server
 
     @staticmethod

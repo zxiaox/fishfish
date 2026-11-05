@@ -44,10 +44,19 @@ class MeshTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(client.snapshot()['last_source_port'],6114)
 
     async def test_automatic_discovery_and_relay(self):
+        await self.run_discovery_and_relay('127.0.0.1')
+
+    async def test_ipv6_discovery_and_relay(self):
+        try:
+            with socket.socket(socket.AF_INET6,socket.SOCK_STREAM) as probe: probe.bind(('::1',0))
+        except OSError: self.skipTest('IPv6 loopback unavailable')
+        await self.run_discovery_and_relay('::1')
+
+    async def run_discovery_and_relay(self, address):
         temporary=tempfile.TemporaryDirectory()
         cert,key,fingerprint=ensure_certificate(temporary.name)
         context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER); context.load_cert_chain(cert,key)
-        broker=broker_module.Broker(); server=await broker.start('127.0.0.1',0,context); broker_port=server.sockets[0].getsockname()[1]
+        broker=broker_module.Broker(); server=await broker.start(address,0,context); broker_port=server.sockets[0].getsockname()[1]
         host_udp=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); host_udp.bind(('127.0.0.1',0)); host_udp.settimeout(.2)
         game_tcp=socket.socket(socket.AF_INET,socket.SOCK_STREAM); game_tcp.bind(('127.0.0.1',0)); game_tcp.listen(); game_tcp.settimeout(5)
         viewer=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); viewer.bind(('127.0.0.1',0)); viewer.settimeout(8)
@@ -66,9 +75,9 @@ class MeshTests(unittest.IsolatedAsyncioTestCase):
                     assert conn.recv(1024)==b'war3-request'; conn.sendall(b'war3-reply')
             except Exception as exc: failures.put(exc)
         threading.Thread(target=game_host,daemon=True).start(); threading.Thread(target=game_stream,daemon=True).start()
-        factory=lambda: open_pinned('127.0.0.1',broker_port,fingerprint)
-        first=LobbyClient('127.0.0.1',broker_port,'',lambda *args:None,connection_factory=factory,game_udp_port=host_udp.getsockname()[1],broadcast_host='127.0.0.1',broadcast_port=viewer.getsockname()[1])
-        second=LobbyClient('127.0.0.1',broker_port,'',lambda *args:None,connection_factory=factory,game_udp_port=1,broadcast_host='127.0.0.1',broadcast_port=viewer.getsockname()[1])
+        factory=lambda: open_pinned(address,broker_port,fingerprint)
+        first=LobbyClient(address,broker_port,'',lambda *args:None,connection_factory=factory,game_udp_port=host_udp.getsockname()[1],broadcast_host='127.0.0.1',broadcast_port=viewer.getsockname()[1])
+        second=LobbyClient(address,broker_port,'',lambda *args:None,connection_factory=factory,game_udp_port=1,broadcast_host='127.0.0.1',broadcast_port=viewer.getsockname()[1])
         try:
             await asyncio.to_thread(first.start); await asyncio.to_thread(second.start)
             data,_=await asyncio.to_thread(viewer.recvfrom,2048)
