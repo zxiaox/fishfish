@@ -15,7 +15,8 @@ APP = 'monty-hall'; MAX_TRIALS = 100000
 
 class App:
     def __init__(self, root):
-        self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light')
+        self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light'); self.host = self.settings.get('host','host1')
+        if self.host not in ('host1', 'host2'): self.host = 'host1'
         self.count = tk.StringVar(value='1000'); self.round_count = tk.StringVar(value='5'); self.strategy = tk.StringVar(value='switch')
         self.save_live = tk.BooleanVar(value=self.settings.get('save_live', True)); self.session_saving = False; self.unsaved_sessions = []
         self.summary = tk.StringVar(); self.live_text = tk.StringVar(); self.rounds = []; self.results = []; self.round_index = 0; self.job = None; self.phase = 'idle'
@@ -34,6 +35,7 @@ class App:
         """Slice the generated 2×2 sheets in memory and keep Tk images alive."""
         self.image_sheets = {}; self.game_images = {}
         for sheet, names in (('host', ('welcome','thinking','win','loss')),
+                             ('host2', ('welcome','thinking','win','loss')),
                              ('doors', ('closed','closed_alt','empty','treasure'))):
             source = tk.PhotoImage(master=self.root, file=str(resource_root() / 'assets' / 'monty-hall-game' / (sheet + '.png')))
             self.image_sheets[sheet] = source
@@ -60,9 +62,14 @@ class App:
         settings=ttk.Frame(live); settings.pack(pady=3)
         ttk.Label(settings,text=t('round_count')).pack(side='left',padx=4)
         ttk.Entry(settings,textvariable=self.round_count,width=6).pack(side='left',padx=4)
-        self.save_checkbox = ttk.Checkbutton(settings, text=t('save_live'), variable=self.save_live, command=self.save)
-        self.save_checkbox.pack(side='left',padx=12)
-        self.start_button = ttk.Button(settings,text=t('live_game'),command=self.start_game); self.start_button.pack(side='left',padx=4)
+        ttk.Label(settings,text=t('host_label')).pack(side='left',padx=(18,4))
+        self.host_choice = ttk.Combobox(settings, values=(t('host_1'),t('host_2')), state='readonly', width=12)
+        self.host_choice.current(0 if self.host == 'host1' else 1); self.host_choice.pack(side='left',padx=4)
+        self.host_choice.bind('<<ComboboxSelected>>', self.change_host)
+        self.start_button = ttk.Button(settings,text=t('live_game'),command=self.start_game); self.start_button.pack(side='left',padx=10)
+        ttk.Style(self.root).configure('Save.TCheckbutton', wraplength=740)
+        self.save_checkbox = ttk.Checkbutton(live, text=t('save_live'), variable=self.save_live, command=self.save, style='Save.TCheckbutton')
+        self.save_checkbox.pack(pady=3)
         ttk.Label(live,textvariable=self.live_text,wraplength=850,justify='center',font=('',11)).pack(pady=5)
         scene=ttk.Frame(live); scene.pack(pady=3)
         self.host_image = ttk.Label(scene, image=self.game_images['host_welcome']); self.host_image.pack(side='left',padx=(0,16))
@@ -119,7 +126,7 @@ class App:
         self.start_button.state(['disabled' if running else '!disabled'])
         self.save_checkbox.state(['disabled' if running else '!disabled'])
         host = 'thinking' if self.phase == 'choose' else ('win' if self.results[-1]['won'] else 'loss') if self.phase == 'result' and self.results else 'welcome'
-        self.host_image.configure(image=self.game_images['host_' + host])
+        self.host_image.configure(image=self.game_images[('host_' if self.host == 'host1' else 'host2_') + host])
         for door, button in enumerate(self.door_buttons, 1):
             button.state(['!disabled' if self.phase=='pick' else 'disabled'])
             label=self.tr('door_number',number=door)
@@ -129,15 +136,21 @@ class App:
                 elif self.phase=='choose' and door==r['revealed']: label += ' · ' + self.tr('empty')
                 if door==r['choice']: label += ' · ' + self.tr('door_selected')
             door_image = 'closed'
+            if self.phase in ('choose', 'result') and door == self.rounds[self.round_index]['revealed']:
+                door_image = 'empty'
             if self.phase == 'result' and door == self.results[-1]['final']:
                 door_image = 'treasure' if self.results[-1]['won'] else 'empty'
             button.configure(text=label, image=self.game_images['doors_' + door_image])
         if self.phase in ('pick','choose'): self.show_round()
         elif self.phase == 'result' and self.results: self.show_result()
 
+    def change_host(self, event=None):
+        self.host = 'host2' if self.host_choice.current() == 1 else 'host1'
+        self.save(); self.update_controls()
+
     def set_language(self, code): self.tr = Translator(code); self.save(); self.build()
     def set_theme(self, theme): self.theme = theme; self.save(); self.build()
-    def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme,'save_live':self.save_live.get()})
+    def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme,'save_live':self.save_live.get(),'host':self.host})
     def close(self): self.save(); self.root.destroy()
 
     def run_experiment(self):

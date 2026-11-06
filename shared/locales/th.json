@@ -71,7 +71,7 @@
   "losses": "แพ้",
   "win_rate": "อัตราชนะ",
   "history_error": "อ่านหรือบันทึกประวัติไม่ได้ ไฟล์เดิมยังคงอยู่ รายละเอียด: {error}",
-  "save_live": "บันทึกข้อมูลเกมสดในเครื่อง",
+  "save_live": "บันทึกข้อมูลเกมสดในเครื่องก่อนเริ่มเกม (เปิดใช้หากคุณสงสัยผลการทดลอง)",
   "session_header": "บันทึกเกมสามประตู",
   "records_saved": "ไฟล์บันทึกเกมจะอยู่ที่:\n{path}\nตำแหน่งประตูถูกบันทึกก่อนเล่นที่:\n{layout}",
   "session_round": "รอบ {number}: เลือกแรก {choice}, เปิด {revealed}, {strategy}, เลือกสุดท้าย {final}, รางวัล {prize}, {result}",
@@ -140,5 +140,8 @@
   "door_number": "ประตู {number}",
   "door_selected": "เลือกแล้ว",
   "door_prompt": "รอบที่ {number} จาก {total}: เลือกประตูหนึ่งบาน",
-  "door_revealed_prompt": "รอบที่ {number} จาก {total}: คุณเลือกประตู {choice} ประตู {revealed} ว่างเปล่า จะเปลี่ยนหรืออยู่ต่อ?"
+  "door_revealed_prompt": "รอบที่ {number} จาก {total}: คุณเลือกประตู {choice} ประตู {revealed} ว่างเปล่า จะเปลี่ยนหรืออยู่ต่อ?",
+  "host_label": "พิธีกร",
+  "host_1": "พิธีกร 1",
+  "host_2": "พิธีกร 2"
 }

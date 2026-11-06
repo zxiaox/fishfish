@@ -71,7 +71,7 @@
   "losses": "失败",
   "win_rate": "胜率",
   "history_error": "无法读取或保存历史记录，现有文件已保留。详情：{error}",
-  "save_live": "在本地保存实时游戏数据",
+  "save_live": "在游戏开始前将实时游戏数据保存在本地（如果您对实验结果持怀疑态度，请启用此选项）。",
   "session_header": "三门问题游戏记录",
   "records_saved": "游戏记录将保存到：\n{path}\n门的预设位置已在游戏前保存到：\n{layout}",
   "session_round": "第 {number} 回合：初选 {choice}，打开 {revealed}，{strategy}，最终 {final}，奖品 {prize}，{result}。",
@@ -140,5 +140,8 @@
   "door_number": "{number} 号门",
   "door_selected": "已选择",
   "door_prompt": "第 {number} / {total} 轮：请选择一扇门。",
-  "door_revealed_prompt": "第 {number} / {total} 轮：你选择了 {choice} 号门。{revealed} 号门是空的。换门还是坚持？"
+  "door_revealed_prompt": "第 {number} / {total} 轮：你选择了 {choice} 号门。{revealed} 号门是空的。换门还是坚持？",
+  "host_label": "主持人",
+  "host_1": "主持人 1",
+  "host_2": "主持人 2"
 }

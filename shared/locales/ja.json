@@ -71,7 +71,7 @@
   "losses": "負け",
   "win_rate": "勝率",
   "history_error": "履歴の読み込みまたは保存に失敗しました。既存ファイルは保持されています。詳細: {error}",
-  "save_live": "ライブゲームのデータをローカルに保存",
+  "save_live": "ゲーム開始前にライブゲームのデータをローカルに保存（実験結果に疑問がある場合は有効にしてください）。",
   "session_header": "3つのドアのゲーム記録",
   "records_saved": "ゲーム記録の保存先:\n{path}\nゲーム前のドア配置の保存先:\n{layout}",
   "session_round": "ラウンド {number}: 初期選択 {choice}、開いたドア {revealed}、{strategy}、最終選択 {final}、賞品 {prize}、{result}。",
@@ -140,5 +140,8 @@
   "door_number": "ドア {number}",
   "door_selected": "選択中",
   "door_prompt": "第 {number} / {total} ラウンド：ドアを選んでください。",
-  "door_revealed_prompt": "第 {number} / {total} ラウンド：ドア {choice} を選択。ドア {revealed} は空です。変更しますか？"
+  "door_revealed_prompt": "第 {number} / {total} ラウンド：ドア {choice} を選択。ドア {revealed} は空です。変更しますか？",
+  "host_label": "司会者",
+  "host_1": "司会者 1",
+  "host_2": "司会者 2"
 }

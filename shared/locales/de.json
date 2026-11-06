@@ -71,7 +71,7 @@
   "losses": "Niederlagen",
   "win_rate": "Gewinnrate",
   "history_error": "Der Verlauf konnte nicht gelesen oder gespeichert werden. Die vorhandene Datei bleibt erhalten. Details: {error}",
-  "save_live": "Live-Spieldaten lokal speichern",
+  "save_live": "Live-Spieldaten vor Spielbeginn lokal speichern (aktivieren, wenn Sie die Versuchsergebnisse anzweifeln).",
   "session_header": "Drei-Türen-Spielprotokoll",
   "records_saved": "Das Spielprotokoll wird gespeichert unter:\n{path}\nDie Türbelegung wurde vor Spielbeginn gespeichert unter:\n{layout}",
   "session_round": "Runde {number}: erste Wahl {choice}, geöffnet {revealed}, {strategy}, letzte Wahl {final}, Preis {prize}, {result}.",
@@ -140,5 +140,8 @@
   "door_number": "Tür {number}",
   "door_selected": "Gewählt",
   "door_prompt": "Runde {number} von {total}: Wähle eine Tür.",
-  "door_revealed_prompt": "Runde {number} von {total}: Du hast Tür {choice} gewählt. Tür {revealed} ist leer. Wechseln oder bleiben?"
+  "door_revealed_prompt": "Runde {number} von {total}: Du hast Tür {choice} gewählt. Tür {revealed} ist leer. Wechseln oder bleiben?",
+  "host_label": "Moderation",
+  "host_1": "Moderatorin 1",
+  "host_2": "Moderatorin 2"
 }

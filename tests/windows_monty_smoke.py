@@ -27,7 +27,13 @@ with tempfile.TemporaryDirectory() as directory:
     app.door_buttons[0].invoke()
     assert app.phase == 'choose'
     assert shown(app.host_image) == str(app.game_images['host_thinking'])
-    assert all(shown(b) == str(app.game_images['doors_closed']) for b in app.door_buttons)
+    revealed = app.rounds[0]['revealed']
+    assert shown(app.door_buttons[revealed-1]) == str(app.game_images['doors_empty'])
+    assert all(shown(b) == str(app.game_images['doors_closed']) for i,b in enumerate(app.door_buttons, 1) if i != revealed)
+    app.host_choice.current(1); app.change_host()
+    assert app.host == 'host2' and module.load_settings(module.APP)['host'] == 'host2'
+    assert shown(app.host_image) == str(app.game_images['host2_thinking'])
+    app.host_choice.current(0); app.change_host()
     assert app.rounds[0]['choice'] == 1
     assert app.rounds[0]['revealed'] not in (1, app.rounds[0]['prize'])
     app.switch_button.invoke()
@@ -35,7 +41,8 @@ with tempfile.TemporaryDirectory() as directory:
     result = app.results[-1]
     assert shown(app.host_image) == str(app.game_images['host_win' if result['won'] else 'host_loss'])
     assert shown(app.door_buttons[result['final']-1]) == str(app.game_images['doors_treasure' if result['won'] else 'doors_empty'])
-    assert all(shown(b) == str(app.game_images['doors_closed']) for i,b in enumerate(app.door_buttons, 1) if i != result['final'])
+    assert shown(app.door_buttons[result['revealed']-1]) == str(app.game_images['doors_empty'])
+    assert all(shown(b) == str(app.game_images['doors_closed']) for i,b in enumerate(app.door_buttons, 1) if i not in (result['final'], result['revealed']))
     assert record.read_text(encoding='utf-8').startswith(before)
     assert len(module.load_history(app.history_path)['live_sessions'][0]['rounds']) == 1
     app.next_button.invoke(); assert app.phase == 'pick'

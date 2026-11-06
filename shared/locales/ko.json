@@ -71,7 +71,7 @@
   "losses": "패배",
   "win_rate": "승률",
   "history_error": "기록을 읽거나 저장할 수 없습니다. 기존 파일은 보존됩니다. 상세: {error}",
-  "save_live": "라이브 게임 데이터를 로컬에 저장",
+  "save_live": "게임 시작 전에 실시간 게임 데이터를 로컬에 저장합니다 (실험 결과가 의심스러우면 활성화하세요).",
   "session_header": "세 개의 문 게임 기록",
   "records_saved": "게임 기록 저장 위치:\n{path}\n게임 전 문 배치 저장 위치:\n{layout}",
   "session_round": "라운드 {number}: 처음 {choice}, 열린 문 {revealed}, {strategy}, 최종 {final}, 상품 {prize}, {result}.",
@@ -140,5 +140,8 @@
   "door_number": "문 {number}",
   "door_selected": "선택됨",
   "door_prompt": "{number} / {total} 라운드: 문을 선택하세요.",
-  "door_revealed_prompt": "{number} / {total} 라운드: {choice}번 문을 선택했습니다. {revealed}번 문은 비어 있습니다. 바꾸시겠습니까?"
+  "door_revealed_prompt": "{number} / {total} 라운드: {choice}번 문을 선택했습니다. {revealed}번 문은 비어 있습니다. 바꾸시겠습니까?",
+  "host_label": "진행자",
+  "host_1": "진행자 1",
+  "host_2": "진행자 2"
 }

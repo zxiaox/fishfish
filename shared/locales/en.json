@@ -71,7 +71,7 @@
   "losses": "Losses",
   "win_rate": "Win rate",
   "history_error": "History could not be read or saved. The existing file has been preserved. Details: {error}",
-  "save_live": "Save live-game data locally",
+  "save_live": "Save live-game data locally before the game begins (enable this if you are skeptical about the experimental results).",
   "session_header": "Three Doors game session",
   "records_saved": "The session record will be saved to:\n{path}\nThe door layouts were saved before play to:\n{layout}",
   "session_round": "Round {number}: initial {choice}, opened {revealed}, {strategy}, final {final}, prize {prize}, {result}.",
@@ -140,5 +140,8 @@
   "door_number": "Door {number}",
   "door_selected": "Selected",
   "door_prompt": "Round {number} of {total}: Choose a door.",
-  "door_revealed_prompt": "Round {number} of {total}: You chose door {choice}. Door {revealed} is empty. Switch or stay?"
+  "door_revealed_prompt": "Round {number} of {total}: You chose door {choice}. Door {revealed} is empty. Switch or stay?",
+  "host_label": "Host",
+  "host_1": "Host 1",
+  "host_2": "Host 2"
 }
