@@ -18,6 +18,12 @@ with tempfile.TemporaryDirectory() as directory:
     assert root.title() == app.tr('war_title')
     assert root['menu'], 'Settings menu missing'
     assert app.connect_button.winfo_exists()
+    # The shared selected indicator is a checkmark and remains available after theme changes.
+    unchecked, checked = root._fishfish_check_images
+    assert checked.get(5, 9) == (255, 255, 255)
+    assert checked.get(2, 2) != unchecked.get(2, 2)
+    app.set_theme('dark'); app.set_theme('light')
+    assert checked.get(5, 9) == (255, 255, 255)
     assert app.connection_mode == 'direct'
     app.server_host='example.test'; app.server_port=47653; app.fingerprint='a'*64; app.save()
     app.open_settings()

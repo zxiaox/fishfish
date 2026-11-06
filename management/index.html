@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FishFish · Application catalog</title><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="shell">
+    <header><a class="brand" href="/"><span class="brand-icon">✳</span> FISHFISH <span class="brand-sub">/ APPLICATIONS</span></a><span class="local-badge"><i></i> LOCAL CATALOG</span></header>
+    <main>
+      <section class="intro"><div><p class="eyebrow">YOUR SOFTWARE, ORGANIZED</p><h1>Application catalog<span>.</span></h1><p class="subtitle">A home for every little idea. Manage your apps, keep track of their IDs, and see how your collection grows.</p></div><button id="add" class="primary">＋ &nbsp; Add application</button></section>
+      <section class="metrics"><div><span>ALL APPLICATIONS</span><strong id="total">—</strong><small>Your entire collection</small></div><div><span>ACTIVE</span><strong id="active">—</strong><small>Ready to use</small></div><div><span>PLANNED</span><strong id="planned">—</strong><small>Ideas in the pipeline</small></div><div><span>NEXT AVAILABLE ID</span><strong id="next">—</strong><small>Assigned automatically</small></div></section>
+      <section class="catalog"><div class="catalog-head"><div><h2>Your applications</h2><p>All your projects, in one place.</p></div><div class="controls"><label class="search"><span>⌕</span><input id="search" placeholder="Search apps or IDs" aria-label="Search applications"></label><select id="filter" aria-label="Filter status"><option value="all">All statuses</option><option value="active">Active</option><option value="planned">Planned</option><option value="archived">Archived</option></select></div></div>
+        <div class="table-scroll"><table><thead><tr><th>ID</th><th>APPLICATION</th><th>STATUS</th><th>VERSION</th><th></th></tr></thead><tbody id="rows"></tbody></table></div><div id="empty" class="empty" hidden>No applications match your search.</div><div id="error" class="error" role="alert" hidden></div><div class="catalog-foot"><span>IDs stay with an application, even when archived.</span><span>MADE FOR THE LITTLE THINGS ✳</span></div>
+      </section>
+    </main><footer>FISHFISH <span>·</span> One idea at a time.</footer>
+  </div>
+  <dialog id="dialog"><form id="form"><div class="modal-head"><div><p class="eyebrow">APPLICATION DETAILS</p><h2 id="dialog-title">Add application</h2></div><button class="close" type="button" id="close" aria-label="Close">×</button></div><label>Name<input name="name" required maxlength="120" placeholder="e.g. Focus Timer"></label><label>Package slug<input name="slug" required maxlength="80" pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="e.g. focus-timer"><small>Lowercase letters, numbers and hyphens. Cannot be changed later.</small></label><label>Description<textarea name="description" maxlength="500" rows="3" placeholder="What does this application do?"></textarea></label><label>Status<select name="status"><option value="planned">Planned</option><option value="active">Active</option><option value="archived">Archived</option></select></label><p id="form-error" class="form-error" role="alert" hidden></p><div class="modal-actions"><button type="button" class="secondary" id="cancel">Cancel</button><button type="submit" class="primary">Save application</button></div></form></dialog>
+  <script src="/app.js" defer></script>
+</body></html>

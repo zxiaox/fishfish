@@ -7,7 +7,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-VERSIONS = {'work-motivator': '1.0.3', 'monty-hall': '1.0.4', 'war3-battle-platform': '1.0.8'}
+VERSIONS = {'work-motivator': '1.0.4', 'monty-hall': '1.0.5', 'war3-battle-platform': '1.0.9'}
 LANGUAGES = {'English': 'en', '简体中文': 'zh', '한국어': 'ko', '日本語': 'ja', 'ไทย': 'th', 'Deutsch': 'de', 'Español': 'es'}
 REPO = 'zxiaox/fishfish'
 
@@ -89,6 +89,28 @@ def apply_theme(root, theme):
     style.theme_use('clam')
     root.configure(background=bg)
     style.configure('.', background=bg, foreground=fg, fieldbackground=field)
+    # The clam theme uses a cross for checked boxes on some platforms. Draw a
+    # consistent checkmark and retain the images on the root for Tk's lifetime.
+    import tkinter as tk
+    if not hasattr(root, '_fishfish_check_images'):
+        unchecked, checked = tk.PhotoImage(master=root, width=16, height=16), tk.PhotoImage(master=root, width=16, height=16)
+        root._fishfish_check_images = (unchecked, checked)
+        style.element_create('Fishfish.indicator', 'image', unchecked,
+                             ('selected', checked), width=20, sticky='w')
+    unchecked, checked = root._fishfish_check_images
+    for image in (unchecked, checked):
+        image.put(bg, to=(0, 0, 16, 16))
+        image.put('#98a8a0' if dark else '#84928a', to=(1, 1, 15, 15))
+        image.put(field, to=(2, 2, 14, 14))
+    checked.put('#328b57' if dark else '#217a45', to=(2, 2, 14, 14))
+    for x, y in ((4, 8), (5, 9), (6, 10), (7, 9), (8, 8), (9, 7), (10, 6), (11, 5)):
+        checked.put('#ffffff', to=(x, y, x + 2, y + 2))
+    style.layout('TCheckbutton', [('Checkbutton.padding', {'sticky': 'nswe', 'children': [
+        ('Fishfish.indicator', {'side': 'left', 'sticky': 'w'}),
+        ('Checkbutton.focus', {'side': 'left', 'sticky': 'w', 'children': [
+            ('Checkbutton.label', {'sticky': 'nswe'})]})]})])
+    style.configure('TCheckbutton', background=bg, foreground=fg)
+    style.map('TCheckbutton', background=[('active', bg)], foreground=[('disabled', '#909d95')])
     style.configure('TFrame', background=bg)
     style.configure('TLabel', background=bg, foreground=fg)
     style.configure('TButton', background=field, foreground=fg)

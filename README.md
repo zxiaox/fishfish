@@ -41,3 +41,13 @@ The Windows GitHub Actions workflow runs tests and packages a standalone executa
 Packaged Windows builds check for updates on startup and through **Check for updates**. The updater searches stable release tags for the current app, prompts before downloading, restricts download URLs to GitHub and its release-asset hosts, and verifies the executable size, x64 PE header, SHA-256 checksum, and GitHub digest when available. It stages the executable and a helper beside the app, waits for the running process to exit, creates an `.exe.backup`, replaces the executable, and restarts it. If starting the replacement fails, it attempts to restore the backup. Settings are stored separately and preserved. The app folder must be writable. Checks require a public repository and internet access and are subject to GitHub API rate limits. It scans at most the first 500 releases; a dedicated per-app feed will be needed as the catalog grows. A checksum is not a publisher signature and cannot protect against a compromised release account. Store builds must follow their marketplace's update and signing rules.
 
 The current UI uses Tkinter; platform-dependent packaging and OS integrations belong at the application boundary. No macOS release is promised until its packaging, signing, and behavior have been implemented and tested.
+
+## Application catalog
+
+The local catalog assigns stable IDs to the apps: **A001** Work Motivator, **A002** Three Doors Problem, and **A003** War3 Battle Platform. Existing package slugs and release tags remain unchanged. Run the management page from the repository root:
+
+```sh
+python management/server.py
+```
+
+Open **http://127.0.0.1:8765/** in a browser. Add, edit, search, and archive applications there; IDs are assigned automatically and archived IDs are not reused. Names, slugs, descriptions, and status are saved in `management/apps.json`; commit that file to share catalog changes with the repository. Versions for existing apps come from `shared/common.py` and are not release verification. New entries are catalog records only: adding one does not create an app, build it, publish it, or allocate a release. Use one catalog server and resolve registry conflicts carefully when merging branches to avoid duplicate IDs. The tool binds only to localhost and has no authentication; it is not ready to expose directly on a public server.

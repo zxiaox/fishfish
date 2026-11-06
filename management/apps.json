@@ -1,0 +1,8 @@
+{
+  "next_id": 4,
+  "apps": [
+    {"id": "A001", "slug": "work-motivator", "name": "Work Motivator", "description": "Track a workday, earnings, and monthly hours.", "status": "active"},
+    {"id": "A002", "slug": "monty-hall", "name": "Three Doors Problem (Monty Hall Problem)", "description": "Explore probability through experiments and live games.", "status": "active"},
+    {"id": "A003", "slug": "war3-battle-platform", "name": "War3 Battle Platform", "description": "Experimental lobby discovery and relay for Classic Warcraft III.", "status": "active"}
+  ]
+}
