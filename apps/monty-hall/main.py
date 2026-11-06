@@ -7,8 +7,8 @@ from tkinter import ttk, filedialog
 from shared import dialogs as messagebox
 from shared.common import Translator, load_settings, save_settings, settings_menu, config_dir, apply_theme, set_app_icon
 from shared.updater import check_updates, helper_mode, cleanup_mode
-from shared.core import trial, prepare_live_rounds, finish_live_round
-from shared.history import load_history, save_history, add_experiment
+from shared.core import trial, prepare_live_rounds, choose_live_door, finish_live_round
+from shared.history import load_history, save_history, add_experiment, limit_live_rounds
 from shared.session_record import create_game_records, append_round
 
 APP = 'monty-hall'; MAX_TRIALS = 100000
@@ -45,7 +45,12 @@ class App:
         self.save_checkbox = ttk.Checkbutton(live, text=t('save_live'), variable=self.save_live, command=self.save)
         self.save_checkbox.pack(pady=4)
         self.start_button = ttk.Button(live,text=t('live_game'),command=self.start_game); self.start_button.pack(pady=4)
-        ttk.Label(live,textvariable=self.live_text,wraplength=680,justify='center',font=('',12)).pack(pady=15)
+        ttk.Label(live,textvariable=self.live_text,wraplength=680,justify='center',font=('',12)).pack(pady=8)
+        doors=ttk.Frame(live); doors.pack(pady=5)
+        self.door_buttons=[]
+        for number in (1,2,3):
+            button=ttk.Button(doors,width=20,command=lambda door=number:self.select_door(door))
+            button.pack(side='left',padx=5); self.door_buttons.append(button)
         buttons = ttk.Frame(live); buttons.pack(pady=4)
         self.switch_button = ttk.Button(buttons,text=t('switch'),command=lambda:self.play('switch')); self.switch_button.pack(side='left',padx=5)
         self.stay_button = ttk.Button(buttons,text=t('stay'),command=lambda:self.play('stay')); self.stay_button.pack(side='left',padx=5)
@@ -56,7 +61,7 @@ class App:
         self.experiment_table = self.make_table(experiments, ('date', 'strategy', 'trial_count', 'wins', 'losses', 'win_rate'))
         self.live_table = self.make_table(sessions, ('date', 'number', 'choice', 'revealed', 'final', 'prize', 'strategy', 'result'))
         self.refresh_history()
-        if self.phase in ('choose', 'result'): self.logs.select(1)
+        if self.phase in ('pick', 'choose', 'result'): self.logs.select(1)
         self.update_controls()
         if self.job: self.experiment.state(['disabled'])
 
@@ -72,9 +77,13 @@ class App:
         for table in (self.experiment_table, self.live_table): table.delete(*table.get_children())
         for entry in reversed(self.history['experiments']):
             self.experiment_table.insert('', 'end', values=(entry['date'], self.tr(entry['strategy']), entry['trials'], entry['wins'], entry['losses'], f"{entry['wins'] / entry['trials'] * 100:.2f}%"))
-        for session in sorted(self.history['live_sessions'] + self.unsaved_sessions, key=lambda item: item['date'], reverse=True):
+        live_rows = []
+        for session in sorted(self.history['live_sessions'] + self.unsaved_sessions, key=lambda item: item['date']):
             for index, result in enumerate(session['rounds'], 1):
-                self.live_table.insert('', 'end', values=(session['date'], index, result['choice'], result['revealed'], result['final'], result['prize'], self.tr(result['strategy']), self.tr('win' if result['won'] else 'loss')))
+                live_rows.append((session['date'], index, result))
+        for date, index, result in reversed(live_rows[-50:]):
+            self.live_table.insert('', 'end', values=(date, index, result['choice'], result['revealed'], result['final'], result['prize'], self.tr(result['strategy']), self.tr('win' if result['won'] else 'loss')))
+
 
     def persist_history(self):
         if self.history_error: return
@@ -86,10 +95,19 @@ class App:
     def update_controls(self):
         for button in (self.switch_button,self.stay_button): button.state(['!disabled' if self.phase=='choose' else 'disabled'])
         self.next_button.state(['!disabled' if self.phase=='result' and self.round_index < len(self.rounds)-1 else 'disabled'])
-        running = self.phase == 'choose' or (self.phase == 'result' and self.round_index < len(self.rounds)-1)
+        running = self.phase in ('pick', 'choose') or (self.phase == 'result' and self.round_index < len(self.rounds)-1)
         self.start_button.state(['disabled' if running else '!disabled'])
         self.save_checkbox.state(['disabled' if running else '!disabled'])
-        if self.phase == 'choose': self.show_round()
+        for door, button in enumerate(self.door_buttons, 1):
+            button.state(['!disabled' if self.phase=='pick' else 'disabled'])
+            label=self.tr('door_number',number=door)
+            if self.phase in ('choose','result'):
+                r=self.rounds[self.round_index]
+                if self.phase=='result': label += ' · ' + self.tr('prize' if door==r['prize'] else 'empty')
+                elif door==r['revealed']: label += ' · ' + self.tr('empty')
+                if door==r['choice']: label += ' · ' + self.tr('door_selected')
+            button.configure(text=label)
+        if self.phase in ('pick','choose'): self.show_round()
         elif self.phase == 'result' and self.results: self.show_result()
 
     def set_language(self, code): self.tr = Translator(code); self.save(); self.build()
@@ -131,20 +149,28 @@ class App:
                 layout = ', '.join(f'{door}: '+self.tr('prize' if door==r['prize'] else 'empty') for door in (1,2,3))
                 lines.append(f"{self.tr('round_label', number=i)} — {layout}")
             try:
-                layout_path = create_game_records(path, '\n'.join(lines)+'\n', self.tr('session_header')+'\n')
+                create_game_records(path, '\n'.join(lines)+'\n', self.tr('session_header')+'\n')
             except FileExistsError:
                 messagebox.showerror(self.tr('error'), self.tr('file_exists'), parent=self.root); return
             except OSError as exc:
                 messagebox.showerror(self.tr('error'), str(exc), parent=self.root); return
-        self.rounds = rounds; self.results = []; self.round_index = 0; self.phase = 'choose'; self.record_path = path; self.session_saving = saving
+        self.rounds = rounds; self.results = []; self.round_index = 0; self.phase = 'pick'; self.record_path = path; self.session_saving = saving
         self.session = {'date': datetime.now().isoformat(timespec='seconds'), 'record_path': path, 'rounds': self.results}
         if saving:
-            messagebox.showinfo(self.tr('live_game'), self.tr('records_saved', path=path, layout=layout_path), parent=self.root)
+            messagebox.showinfo(self.tr('live_game'), self.tr('record_saved', path=path), parent=self.root)
         self.update_controls()
 
     def show_round(self):
         r=self.rounds[self.round_index]
-        self.live_text.set(self.tr('round_prompt',number=self.round_index+1,total=len(self.rounds),choice=r['choice'],revealed=r['revealed']))
+        if self.phase == 'pick':
+            self.live_text.set(self.tr('door_prompt',number=self.round_index+1,total=len(self.rounds)))
+        else:
+            self.live_text.set(self.tr('door_revealed_prompt',number=self.round_index+1,total=len(self.rounds),choice=r['choice'],revealed=r['revealed']))
+
+    def select_door(self, door):
+        if self.phase != 'pick': return
+        self.rounds[self.round_index] = choose_live_door(self.rounds[self.round_index], door)
+        self.phase = 'choose'; self.update_controls()
 
     def play(self, strategy):
         if self.phase != 'choose': return
@@ -157,6 +183,7 @@ class App:
             try: append_round(self.record_path, line)
             except OSError as exc: messagebox.showerror(self.tr('error'), self.tr('record_error', error=str(exc)), parent=self.root)
             self.persist_history()
+        limit_live_rounds(self.unsaved_sessions)
         self.refresh_history(); self.logs.select(1)
         self.phase='result'; self.show_result(); self.update_controls()
 
@@ -166,7 +193,7 @@ class App:
 
     def next_round(self):
         if self.phase != 'result' or self.round_index+1 >= len(self.rounds): return
-        self.round_index += 1; self.phase='choose'; self.update_controls()
+        self.round_index += 1; self.phase='pick'; self.update_controls()
 
 if __name__ == '__main__':
     if not helper_mode(APP):

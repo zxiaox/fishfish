@@ -60,7 +60,7 @@
   "round_label": "Round {number}",
   "round_error": "Enter a whole number from 1 to 20.",
   "file_exists": "Choose a new file name; existing files are not overwritten.",
-  "record_saved": "Door layouts were saved before play to:\n{path}\nYou may open the file to check them.",
+  "record_saved": "The precommitted layouts and game results will be saved in one file:\n{path}",
   "round_prompt": "Round {number} of {total}: Your randomly selected door is {choice}. The host opened empty door {revealed}. Switch or stay?",
   "round_result": "Round {number}: Prize behind door {prize}; your final choice was {final}. {result}! Wins: {wins}/{total}.",
   "work_config": "Work schedule and wage",
@@ -136,5 +136,9 @@
   "war_ipv6_none": "No global IPv6 address found",
   "war_ipv6_error": "Unable to check addresses",
   "war_ipv6_listening": "IPv6 listener started; internet reachability has not been checked.",
-  "war_ipv6_unavailable": "IPv6 listener could not start. IPv4 remains available."
+  "war_ipv6_unavailable": "IPv6 listener could not start. IPv4 remains available.",
+  "door_number": "Door {number}",
+  "door_selected": "Selected",
+  "door_prompt": "Round {number} of {total}: Choose a door.",
+  "door_revealed_prompt": "Round {number} of {total}: You chose door {choice}. Door {revealed} is empty. Switch or stay?"
 }

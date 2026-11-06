@@ -85,13 +85,15 @@ def trial(strategy, rng=random):
 def prepare_live_rounds(count, rng=random):
     if not 1 <= count <= 20:
         raise ValueError('round count')
-    rounds = []
-    for _ in range(count):
-        prize = rng.randrange(1, 4)
-        choice = rng.randrange(1, 4)
-        revealed = rng.choice([d for d in (1, 2, 3) if d not in (prize, choice)])
-        rounds.append({'prize': prize, 'choice': choice, 'revealed': revealed})
-    return rounds
+    return [{'prize': rng.randrange(1, 4)} for _ in range(count)]
+
+
+def choose_live_door(round_data, choice, rng=random):
+    if type(choice) is not int or choice not in (1, 2, 3): raise ValueError('door')
+    prize = round_data.get('prize')
+    if type(prize) is not int or prize not in (1, 2, 3): raise ValueError('prize')
+    revealed = rng.choice([door for door in (1, 2, 3) if door not in (prize, choice)])
+    return {**round_data, 'choice': choice, 'revealed': revealed}
 
 
 def finish_live_round(round_data, strategy):

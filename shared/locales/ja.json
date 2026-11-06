@@ -60,7 +60,7 @@
   "round_label": "ラウンド {number}",
   "round_error": "1から20の整数を入力してください。",
   "file_exists": "新しいファイル名を選択してください。既存のファイルは上書きしません。",
-  "record_saved": "開始前にドアの配置を保存しました:\n{path}\nファイルを開いて確認できます。",
+  "record_saved": "事前に決めた配置と結果を一つのファイルに保存します：\n{path}",
   "round_prompt": "ラウンド {number}/{total}: ランダムにドア {choice} が選ばれました。司会者は空のドア {revealed} を開きました。変更しますか？",
   "round_result": "ラウンド {number}: 賞品はドア {prize}、最終選択は {final}。{result}！勝利: {wins}/{total}。",
   "work_config": "勤務時間と時給",
@@ -136,5 +136,9 @@
   "war_ipv6_none": "グローバル IPv6 アドレスがありません",
   "war_ipv6_error": "アドレスを確認できません",
   "war_ipv6_listening": "IPv6 待ち受け開始。インターネットからの接続は未確認です。",
-  "war_ipv6_unavailable": "IPv6 待ち受けに失敗しました。IPv4 は使用できます。"
+  "war_ipv6_unavailable": "IPv6 待ち受けに失敗しました。IPv4 は使用できます。",
+  "door_number": "ドア {number}",
+  "door_selected": "選択中",
+  "door_prompt": "第 {number} / {total} ラウンド：ドアを選んでください。",
+  "door_revealed_prompt": "第 {number} / {total} ラウンド：ドア {choice} を選択。ドア {revealed} は空です。変更しますか？"
 }

@@ -60,7 +60,7 @@
   "round_label": "라운드 {number}",
   "round_error": "1부터 20까지 정수를 입력하세요.",
   "file_exists": "새 파일 이름을 선택하세요. 기존 파일은 덮어쓰지 않습니다.",
-  "record_saved": "게임 전에 문 배치가 저장되었습니다:\n{path}\n파일을 열어 확인할 수 있습니다.",
+  "record_saved": "미리 정해진 문 배치와 결과가 하나의 파일에 저장됩니다:\n{path}",
   "round_prompt": "라운드 {number}/{total}: 무작위로 {choice}번 문을 선택했습니다. 진행자가 빈 {revealed}번 문을 열었습니다. 바꾸시겠습니까?",
   "round_result": "라운드 {number}: 상품은 {prize}번 문에 있고 최종 선택은 {final}번입니다. {result}! 승리: {wins}/{total}.",
   "work_config": "근무 시간 및 시급",
@@ -136,5 +136,9 @@
   "war_ipv6_none": "전역 IPv6 주소가 없습니다",
   "war_ipv6_error": "주소를 확인할 수 없습니다",
   "war_ipv6_listening": "IPv6 수신을 시작했습니다. 인터넷 연결 가능 여부는 확인되지 않았습니다.",
-  "war_ipv6_unavailable": "IPv6 수신을 시작하지 못했습니다. IPv4는 사용할 수 있습니다."
+  "war_ipv6_unavailable": "IPv6 수신을 시작하지 못했습니다. IPv4는 사용할 수 있습니다.",
+  "door_number": "문 {number}",
+  "door_selected": "선택됨",
+  "door_prompt": "{number} / {total} 라운드: 문을 선택하세요.",
+  "door_revealed_prompt": "{number} / {total} 라운드: {choice}번 문을 선택했습니다. {revealed}번 문은 비어 있습니다. 바꾸시겠습니까?"
 }

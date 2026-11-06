@@ -60,7 +60,7 @@
   "round_label": "Ronda {number}",
   "round_error": "Introduce un entero entre 1 y 20.",
   "file_exists": "Elige otro nombre; no se sobrescriben archivos existentes.",
-  "record_saved": "La distribución de puertas se guardó antes de jugar en:\n{path}\nPuedes abrir el archivo para comprobarla.",
+  "record_saved": "La distribución fijada antes de jugar y los resultados se guardarán en un solo archivo:\n{path}",
   "round_prompt": "Ronda {number}/{total}: Se eligió al azar la puerta {choice}. El presentador abrió la puerta vacía {revealed}. ¿Cambiar o mantener?",
   "round_result": "Ronda {number}: Premio tras la puerta {prize}; elección final {final}. ¡{result}! Victorias: {wins}/{total}.",
   "work_config": "Horario y salario",
@@ -136,5 +136,9 @@
   "war_ipv6_none": "No se encontró una dirección IPv6 global",
   "war_ipv6_error": "No se pudieron comprobar las direcciones",
   "war_ipv6_listening": "Escucha IPv6 iniciada; no se ha comprobado el acceso desde Internet.",
-  "war_ipv6_unavailable": "No se pudo iniciar IPv6; IPv4 sigue disponible."
+  "war_ipv6_unavailable": "No se pudo iniciar IPv6; IPv4 sigue disponible.",
+  "door_number": "Puerta {number}",
+  "door_selected": "Elegida",
+  "door_prompt": "Ronda {number} de {total}: Elige una puerta.",
+  "door_revealed_prompt": "Ronda {number} de {total}: Elegiste la puerta {choice}. La puerta {revealed} está vacía. ¿Cambiar o mantener?"
 }

@@ -60,7 +60,7 @@
   "round_label": "第 {number} 回合",
   "round_error": "请输入 1 到 20 之间的整数。",
   "file_exists": "请选择新的文件名，不会覆盖已有文件。",
-  "record_saved": "门的位置已在游戏开始前保存到：\n{path}\n您可以打开文件核对。",
+  "record_saved": "预先确定的门后内容和游戏结果将保存在同一个文件中：\n{path}",
   "round_prompt": "第 {number}/{total} 回合：您随机选中了 {choice} 号门。主持人打开了空的 {revealed} 号门。换门还是保持？",
   "round_result": "第 {number} 回合：奖品在 {prize} 号门，您最终选择了 {final} 号门。{result}！胜场：{wins}/{total}。",
   "work_config": "工作时间与时薪",
@@ -136,5 +136,9 @@
   "war_ipv6_none": "未找到全球 IPv6 地址",
   "war_ipv6_error": "无法检查地址",
   "war_ipv6_listening": "IPv6 监听已启动；尚未验证互联网连通性。",
-  "war_ipv6_unavailable": "IPv6 监听启动失败；IPv4 仍可使用。"
+  "war_ipv6_unavailable": "IPv6 监听启动失败；IPv4 仍可使用。",
+  "door_number": "{number} 号门",
+  "door_selected": "已选择",
+  "door_prompt": "第 {number} / {total} 轮：请选择一扇门。",
+  "door_revealed_prompt": "第 {number} / {total} 轮：你选择了 {choice} 号门。{revealed} 号门是空的。换门还是坚持？"
 }

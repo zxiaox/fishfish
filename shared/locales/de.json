@@ -60,7 +60,7 @@
   "round_label": "Runde {number}",
   "round_error": "Eine ganze Zahl von 1 bis 20 eingeben.",
   "file_exists": "Neuen Dateinamen wählen; vorhandene Dateien werden nicht überschrieben.",
-  "record_saved": "Die Türbelegung wurde vor Spielbeginn gespeichert:\n{path}\nDie Datei kann zur Kontrolle geöffnet werden.",
+  "record_saved": "Die vorher festgelegte Türbelegung und die Ergebnisse werden in einer Datei gespeichert:\n{path}",
   "round_prompt": "Runde {number}/{total}: Zufällig wurde Tür {choice} gewählt. Der Moderator öffnete die leere Tür {revealed}. Wechseln oder bleiben?",
   "round_result": "Runde {number}: Preis hinter Tür {prize}; endgültige Wahl {final}. {result}! Siege: {wins}/{total}.",
   "work_config": "Arbeitszeit und Stundenlohn",
@@ -136,5 +136,9 @@
   "war_ipv6_none": "Keine globale IPv6-Adresse gefunden",
   "war_ipv6_error": "Adressen konnten nicht geprüft werden",
   "war_ipv6_listening": "IPv6-Empfang gestartet; Erreichbarkeit aus dem Internet nicht geprüft.",
-  "war_ipv6_unavailable": "IPv6-Empfang fehlgeschlagen; IPv4 bleibt verfügbar."
+  "war_ipv6_unavailable": "IPv6-Empfang fehlgeschlagen; IPv4 bleibt verfügbar.",
+  "door_number": "Tür {number}",
+  "door_selected": "Gewählt",
+  "door_prompt": "Runde {number} von {total}: Wähle eine Tür.",
+  "door_revealed_prompt": "Runde {number} von {total}: Du hast Tür {choice} gewählt. Tür {revealed} ist leer. Wechseln oder bleiben?"
 }

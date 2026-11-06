@@ -8,9 +8,9 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 from shared.common import find_latest
-from shared.core import trial, work_status, work_interval, observed_work_by_day, prepare_live_rounds, finish_live_round
+from shared.core import trial, work_status, work_interval, observed_work_by_day, prepare_live_rounds, choose_live_door, finish_live_round
 from shared.updater import asset_details, check_url, verify
-from shared.history import load_history, save_history, add_experiment
+from shared.history import load_history, save_history, add_experiment, limit_live_rounds
 from shared.session_record import create_game_records, append_round
 
 class Tests(unittest.TestCase):
@@ -56,12 +56,14 @@ class Tests(unittest.TestCase):
         rounds = prepare_live_rounds(20, random.Random(17))
         self.assertEqual(len(rounds), 20)
         for game in rounds:
-            self.assertNotIn(game['revealed'], (game['prize'], game['choice']))
-            for strategy in ('stay', 'switch'):
-                result = finish_live_round(game, strategy)
-                self.assertEqual(result['prize'], game['prize'])
-                self.assertEqual(result['won'], result['final'] == game['prize'])
-                self.assertEqual(result['final'] == game['choice'], strategy == 'stay')
+            for door in (1, 2, 3):
+                selected = choose_live_door(game, door, random.Random(door))
+                self.assertNotIn(selected['revealed'], (selected['prize'], door))
+                for strategy in ('stay', 'switch'):
+                    result = finish_live_round(selected, strategy)
+                    self.assertEqual(result['prize'], game['prize'])
+                    self.assertEqual(result['won'], result['final'] == game['prize'])
+                    self.assertEqual(result['final'] == door, strategy == 'stay')
         for count in (0, 21):
             with self.assertRaises(ValueError): prepare_live_rounds(count)
 
@@ -71,7 +73,7 @@ class Tests(unittest.TestCase):
             history = load_history(path)
             for index in range(55):
                 add_experiment(history, {'date': str(index), 'strategy': 'switch', 'trials': 2, 'wins': 1, 'losses': 1})
-            live = {'date': '2026-11-04', 'record_path': 'layout.txt', 'rounds': [finish_live_round(prepare_live_rounds(1, random.Random(3))[0], 'stay')]}
+            live = {'date': '2026-11-04', 'record_path': 'layout.txt', 'rounds': [finish_live_round(choose_live_door(prepare_live_rounds(1, random.Random(3))[0], 1), 'stay')]}
             history['live_sessions'].append(live)
             save_history(path, history)
             restored = load_history(path)
@@ -85,19 +87,21 @@ class Tests(unittest.TestCase):
     def test_game_text_records_preserve_precommitted_layout(self):
         with tempfile.TemporaryDirectory() as directory:
             session = Path(directory) / 'three-door-time-test.txt'
-            layout = create_game_records(session, 'Round 1 — 1: Empty, 2: Prize, 3: Empty\n', 'Game session\n')
-            self.assertEqual(layout.name, 'three-door-time-test-doors.txt')
-            original = layout.read_text(encoding='utf-8')
+            create_game_records(session, 'Round 1 — 1: Empty, 2: Prize, 3: Empty\n', 'Game session\n')
+            original = session.read_text(encoding='utf-8')
+            self.assertIn('2: Prize', original)
             append_round(session, 'Round 1: initial 1, opened 3, switch, final 2, prize 2, win.')
-            self.assertEqual(layout.read_text(encoding='utf-8'), original)
+            self.assertTrue(session.read_text(encoding='utf-8').startswith(original))
             self.assertIn('final 2', session.read_text(encoding='utf-8'))
+            self.assertEqual([p.name for p in Path(directory).iterdir()], [session.name])
             with self.assertRaises(FileExistsError): create_game_records(session, 'replacement', 'replacement')
-            self.assertEqual(layout.read_text(encoding='utf-8'), original)
-            other = Path(directory) / 'another.txt'
-            other.with_name('another-doors.txt').write_text('existing', encoding='utf-8')
-            with self.assertRaises(FileExistsError): create_game_records(other, 'replacement', 'replacement')
-            self.assertFalse(other.exists())
-            self.assertEqual(other.with_name('another-doors.txt').read_text(encoding='utf-8'), 'existing')
+            self.assertTrue(session.read_text(encoding='utf-8').startswith(original))
+
+    def test_live_history_limits_round_entries(self):
+        sessions = [{'date': str(i), 'rounds': [{'n': i * 20 + j} for j in range(20)]} for i in range(4)]
+        limit_live_rounds(sessions)
+        entries = [r['n'] for session in sessions for r in session['rounds']]
+        self.assertEqual(entries, list(range(30, 80)))
 
     def test_release_selection(self):
         def release(tag, **kw):

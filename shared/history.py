@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 MAX_EXPERIMENTS = 50
+MAX_LIVE_ROUNDS = 50
 
 
 def load_history(path):
@@ -27,10 +28,24 @@ def load_history(path):
                 type(record.get('won')) is not bool or
                 any(type(record.get(k)) is not int or record[k] not in (1, 2, 3) for k in ('choice', 'revealed', 'final', 'prize'))):
                 raise ValueError('Invalid live round')
+    del data['experiments'][:-MAX_EXPERIMENTS]
+    limit_live_rounds(data['live_sessions'])
     return data
 
 
+def limit_live_rounds(sessions):
+    total = sum(len(session['rounds']) for session in sessions)
+    while sessions and total > MAX_LIVE_ROUNDS:
+        excess = total - MAX_LIVE_ROUNDS
+        rounds = sessions[0]['rounds']
+        remove = min(excess, len(rounds))
+        del rounds[:remove]; total -= remove
+        if not rounds: sessions.pop(0)
+
+
 def save_history(path, history):
+    del history['experiments'][:-MAX_EXPERIMENTS]
+    limit_live_rounds(history['live_sessions'])
     path = Path(path)
     temporary = path.with_suffix('.tmp')
     temporary.write_text(json.dumps(history, ensure_ascii=False, indent=2), encoding='utf-8')
