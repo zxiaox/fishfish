@@ -5,7 +5,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
 from tkinter import ttk, filedialog
 from shared import dialogs as messagebox
-from shared.common import Translator, load_settings, save_settings, settings_menu, config_dir, apply_theme, set_app_icon
+from shared.common import Translator, load_settings, save_settings, settings_menu, config_dir, apply_theme, set_app_icon, resource_root
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import trial, prepare_live_rounds, choose_live_door, finish_live_round
 from shared.history import load_history, save_history, add_experiment, limit_live_rounds
@@ -25,13 +25,29 @@ class App:
         except (OSError, ValueError) as exc:
             self.history_error = str(exc); self.history = {'experiments': [], 'live_sessions': []}
         self.session = None
+        self.load_game_images()
         set_app_icon(root, APP); self.build()
         if self.history_error: root.after(100, lambda: messagebox.showerror(self.tr('error'), self.tr('history_error', error=self.history_error), parent=self.root))
         root.protocol('WM_DELETE_WINDOW', self.close)
 
+    def load_game_images(self):
+        """Slice the generated 2×2 sheets in memory and keep Tk images alive."""
+        self.image_sheets = {}; self.game_images = {}
+        for sheet, names in (('host', ('welcome','thinking','win','loss')),
+                             ('doors', ('closed','closed_alt','empty','treasure'))):
+            source = tk.PhotoImage(master=self.root, file=str(resource_root() / 'assets' / 'monty-hall-game' / (sheet + '.png')))
+            self.image_sheets[sheet] = source
+            width, height = source.width() // 2, source.height() // 2
+            step = max(1, (width + 159) // 160)
+            for index, name in enumerate(names):
+                x, y = (index % 2) * width, (index // 2) * height
+                image = tk.PhotoImage(master=self.root)
+                image.tk.call(image, 'copy', source, '-from', x, y, x + width, y + height, '-subsample', step, step)
+                self.game_images[sheet + '_' + name] = image
+
     def build(self):
         for child in self.root.winfo_children(): child.destroy()
-        t = self.tr; self.root._fishfish_language = t.code; apply_theme(self.root, self.theme); self.root.title(t('monty_title')); self.root.geometry('920x820'); self.root.minsize(760, 650)
+        t = self.tr; self.root._fishfish_language = t.code; apply_theme(self.root, self.theme); self.root.title(t('monty_title')); self.root.geometry('980x940'); self.root.minsize(820, 780)
         settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
                       lambda: check_updates(self.root, APP, self.tr))
         frame = ttk.LabelFrame(self.root, text=t('run_experiment'), padding=12); frame.pack(fill='x', padx=12, pady=5)
@@ -41,16 +57,20 @@ class App:
         self.experiment = ttk.Button(frame,text=t('run_experiment'),command=self.run_experiment); self.experiment.grid(row=0,column=4,padx=8)
         ttk.Label(frame, textvariable=self.summary, wraplength=690).grid(row=1,columnspan=5,pady=8)
         live = ttk.LabelFrame(self.root, text=t('live_game'), padding=12); live.pack(fill='x', padx=12, pady=8)
-        ttk.Label(live,text=t('round_count')).pack(); ttk.Entry(live,textvariable=self.round_count,width=8).pack(pady=4)
-        self.save_checkbox = ttk.Checkbutton(live, text=t('save_live'), variable=self.save_live, command=self.save)
-        self.save_checkbox.pack(pady=4)
-        self.start_button = ttk.Button(live,text=t('live_game'),command=self.start_game); self.start_button.pack(pady=4)
-        ttk.Label(live,textvariable=self.live_text,wraplength=680,justify='center',font=('',12)).pack(pady=8)
-        doors=ttk.Frame(live); doors.pack(pady=5)
+        settings=ttk.Frame(live); settings.pack(pady=3)
+        ttk.Label(settings,text=t('round_count')).pack(side='left',padx=4)
+        ttk.Entry(settings,textvariable=self.round_count,width=6).pack(side='left',padx=4)
+        self.save_checkbox = ttk.Checkbutton(settings, text=t('save_live'), variable=self.save_live, command=self.save)
+        self.save_checkbox.pack(side='left',padx=12)
+        self.start_button = ttk.Button(settings,text=t('live_game'),command=self.start_game); self.start_button.pack(side='left',padx=4)
+        ttk.Label(live,textvariable=self.live_text,wraplength=850,justify='center',font=('',11)).pack(pady=5)
+        scene=ttk.Frame(live); scene.pack(pady=3)
+        self.host_image = ttk.Label(scene, image=self.game_images['host_welcome']); self.host_image.pack(side='left',padx=(0,16))
+        doors=ttk.Frame(scene); doors.pack(side='left')
         self.door_buttons=[]
         for number in (1,2,3):
-            button=ttk.Button(doors,width=20,command=lambda door=number:self.select_door(door))
-            button.pack(side='left',padx=5); self.door_buttons.append(button)
+            button=ttk.Button(doors, image=self.game_images['doors_closed'], compound='top', command=lambda door=number:self.select_door(door))
+            button.pack(side='left',padx=3); self.door_buttons.append(button)
         buttons = ttk.Frame(live); buttons.pack(pady=4)
         self.switch_button = ttk.Button(buttons,text=t('switch'),command=lambda:self.play('switch')); self.switch_button.pack(side='left',padx=5)
         self.stay_button = ttk.Button(buttons,text=t('stay'),command=lambda:self.play('stay')); self.stay_button.pack(side='left',padx=5)
@@ -98,15 +118,20 @@ class App:
         running = self.phase in ('pick', 'choose') or (self.phase == 'result' and self.round_index < len(self.rounds)-1)
         self.start_button.state(['disabled' if running else '!disabled'])
         self.save_checkbox.state(['disabled' if running else '!disabled'])
+        host = 'thinking' if self.phase == 'choose' else ('win' if self.results[-1]['won'] else 'loss') if self.phase == 'result' and self.results else 'welcome'
+        self.host_image.configure(image=self.game_images['host_' + host])
         for door, button in enumerate(self.door_buttons, 1):
             button.state(['!disabled' if self.phase=='pick' else 'disabled'])
             label=self.tr('door_number',number=door)
             if self.phase in ('choose','result'):
                 r=self.rounds[self.round_index]
-                if self.phase=='result': label += ' · ' + self.tr('prize' if door==r['prize'] else 'empty')
-                elif door==r['revealed']: label += ' · ' + self.tr('empty')
+                if self.phase=='result' and door==r['final']: label += ' · ' + self.tr('prize' if r['won'] else 'empty')
+                elif self.phase=='choose' and door==r['revealed']: label += ' · ' + self.tr('empty')
                 if door==r['choice']: label += ' · ' + self.tr('door_selected')
-            button.configure(text=label)
+            door_image = 'closed'
+            if self.phase == 'result' and door == self.results[-1]['final']:
+                door_image = 'treasure' if self.results[-1]['won'] else 'empty'
+            button.configure(text=label, image=self.game_images['doors_' + door_image])
         if self.phase in ('pick','choose'): self.show_round()
         elif self.phase == 'result' and self.results: self.show_result()
 

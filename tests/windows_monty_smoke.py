@@ -18,15 +18,23 @@ with tempfile.TemporaryDirectory() as directory:
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
     app.round_count.set('2'); app.start_button.invoke()
     assert app.phase == 'pick'
+    assert str(app.host_image.cget('image')) == str(app.game_images['host_welcome'])
+    assert all(str(b.cget('image')) == str(app.game_images['doors_closed']) for b in app.door_buttons)
     assert len(list(Path(directory).glob('*.txt'))) == 1
     before = record.read_text(encoding='utf-8')
     assert before.count(app.tr('round_label', number=1)) == 1
     app.door_buttons[0].invoke()
     assert app.phase == 'choose'
+    assert str(app.host_image.cget('image')) == str(app.game_images['host_thinking'])
+    assert all(str(b.cget('image')) == str(app.game_images['doors_closed']) for b in app.door_buttons)
     assert app.rounds[0]['choice'] == 1
     assert app.rounds[0]['revealed'] not in (1, app.rounds[0]['prize'])
     app.switch_button.invoke()
     assert app.phase == 'result' and len(app.results) == 1
+    result = app.results[-1]
+    assert str(app.host_image.cget('image')) == str(app.game_images['host_win' if result['won'] else 'host_loss'])
+    assert str(app.door_buttons[result['final']-1].cget('image')) == str(app.game_images['doors_treasure' if result['won'] else 'doors_empty'])
+    assert all(str(b.cget('image')) == str(app.game_images['doors_closed']) for i,b in enumerate(app.door_buttons, 1) if i != result['final'])
     assert record.read_text(encoding='utf-8').startswith(before)
     assert len(module.load_history(app.history_path)['live_sessions'][0]['rounds']) == 1
     app.next_button.invoke(); assert app.phase == 'pick'
