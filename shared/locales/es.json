@@ -144,5 +144,7 @@
   "host_label": "Presentadora",
   "host_1": "Presentadora 1",
   "host_2": "Presentadora 2",
-  "eliminated_by_host": "Eliminada por la presentadora"
+  "eliminated_by_host": "Eliminada por la presentadora",
+  "host_3": "Presentador 3",
+  "game_sound_english": "Sonidos del juego y voz en inglés"
 }

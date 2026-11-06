@@ -144,5 +144,7 @@
   "host_label": "司会者",
   "host_1": "司会者 1",
   "host_2": "司会者 2",
-  "eliminated_by_host": "司会者が除外"
+  "eliminated_by_host": "司会者が除外",
+  "host_3": "司会者 3",
+  "game_sound_english": "ゲーム効果音と英語音声"
 }

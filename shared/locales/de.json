@@ -144,5 +144,7 @@
   "host_label": "Moderation",
   "host_1": "Moderatorin 1",
   "host_2": "Moderatorin 2",
-  "eliminated_by_host": "Von der Moderation ausgeschlossen"
+  "eliminated_by_host": "Von der Moderation ausgeschlossen",
+  "host_3": "Moderator 3",
+  "game_sound_english": "Spielklänge und englische Sprachausgabe"
 }

@@ -17,6 +17,11 @@ with tempfile.TemporaryDirectory() as directory:
     info_messages = []
     module.messagebox.showinfo = lambda *args, **kwargs: info_messages.append((args, kwargs))
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
+    class FakeSounds:
+        def __init__(self): self.calls = []
+        def play(self, name): self.calls.append(name)
+        def stop(self): self.calls.append('stop')
+    app.sound_player = FakeSounds()
     assert app.phase == 'idle' and all('disabled' not in b.state() for b in app.door_buttons)
     app.door_buttons[0].invoke(); assert app.phase == 'idle'
     assert app.host == 'host2'
@@ -27,6 +32,7 @@ with tempfile.TemporaryDirectory() as directory:
     def shown(widget): return str(root.tk.splitlist(widget.cget('image'))[0])
     app.round_count.set('2'); app.start_button.invoke()
     assert app.phase == 'pick' and all('disabled' not in b.state() for b in app.door_buttons)
+    assert app.sound_player.calls[-1] == 'female1_choose'
     assert not info_messages, 'Starting a saved session should not show a confirmation popup'
     assert shown(app.host_image) == str(app.game_images['host_welcome'])
     assert all(shown(b) == str(app.game_images['doors_closed']) for b in app.door_buttons)
@@ -38,6 +44,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert app.phase == 'choose'
     assert shown(app.host_image) == str(app.game_images['host_thinking'])
     revealed = app.rounds[0]['revealed']
+    assert app.sound_player.calls[-1] == 'female1_door' + str(revealed)
     assert shown(app.door_buttons[revealed-1]) == str(app.game_images['doors_empty'])
     def assert_revealed_label():
         label = str(app.door_buttons[revealed-1].cget('text'))
@@ -51,6 +58,13 @@ with tempfile.TemporaryDirectory() as directory:
     app.host_choice.current(1); app.change_host()
     assert app.host == 'host2' and module.load_settings(module.APP)['host'] == 'host2'
     assert shown(app.host_image) == str(app.game_images['host2_thinking'])
+    app.host_choice.current(2); app.change_host()
+    assert app.host == 'host3' and module.load_settings(module.APP)['host'] == 'host3'
+    assert shown(app.host_image) == str(app.game_images['host3_thinking'])
+    app.play_sound('choose'); assert app.sound_player.calls[-1] == 'male_choose'
+    app.sound_enabled.set(False); app.change_sound(); before_calls = list(app.sound_player.calls)
+    app.play_sound('choose'); assert app.sound_player.calls == before_calls
+    app.sound_enabled.set(True); app.change_sound()
     app.host_choice.current(0); app.change_host()
     assert app.rounds[0]['choice'] == first_choice
     assert app.rounds[0]['revealed'] not in (first_choice, app.rounds[0]['prize'])
@@ -62,6 +76,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert all('disabled' not in b.state() for b in app.door_buttons)
     app.door_buttons[0].invoke(); assert app.phase == 'result' and len(app.results) == 1
     result = app.results[-1]
+    assert app.sound_player.calls[-1] == ('success' if result['won'] else 'failure')
     assert shown(app.host_image) == str(app.game_images['host_win' if result['won'] else 'host_loss'])
     assert shown(app.door_buttons[result['final']-1]) == str(app.game_images['doors_treasure' if result['won'] else 'doors_empty'])
     assert shown(app.door_buttons[result['revealed']-1]) == str(app.game_images['doors_empty'])

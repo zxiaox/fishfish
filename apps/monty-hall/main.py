@@ -11,14 +11,16 @@ from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import trial, prepare_live_rounds, choose_live_door, finish_live_round
 from shared.history import load_history, save_history, add_experiment, limit_live_rounds
 from shared.session_record import create_game_records, append_round
+from sound import SoundPlayer
 
 APP = 'monty-hall'; MAX_TRIALS = 100000
 
 class App:
     def __init__(self, root):
         self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light'); self.host = self.settings.get('host','host2')
-        if self.host not in ('host1', 'host2'): self.host = 'host2'
+        if self.host not in ('host1', 'host2', 'host3'): self.host = 'host2'
         self.count = tk.StringVar(value='1000'); self.round_count = tk.StringVar(value='5'); self.strategy = tk.StringVar(value='switch')
+        self.sound_enabled = tk.BooleanVar(value=self.settings.get('sound_enabled', True)); self.sound_player = SoundPlayer(resource_root() / 'assets' / 'monty-hall-game' / 'audio')
         self.save_live = tk.BooleanVar(value=self.settings.get('save_live', True)); self.session_saving = False; self.unsaved_sessions = []
         self.summary = tk.StringVar(); self.live_text = tk.StringVar(); self.rounds = []; self.results = []; self.round_index = 0; self.job = None; self.phase = 'idle'
         self.history_path = config_dir(APP) / 'history.json'
@@ -35,7 +37,7 @@ class App:
     def load_game_images(self):
         """Resize host art with high-quality filtering and keep Tk images alive."""
         self.image_sheets = {}; self.game_images = {}
-        for sheet in ('host', 'host2'):
+        for sheet in ('host', 'host2', 'host3'):
             with Image.open(resource_root() / 'assets' / 'monty-hall-game' / (sheet + '.png')) as source:
                 width, height = source.width // 2, source.height // 2
                 for index, name in enumerate(('welcome', 'thinking', 'win', 'loss')):
@@ -56,8 +58,10 @@ class App:
     def build(self):
         for child in self.root.winfo_children(): child.destroy()
         t = self.tr; self.root._fishfish_language = t.code; apply_theme(self.root, self.theme); self.root.title(t('monty_title')); self.root.geometry('980x940'); self.root.minsize(820, 780)
-        settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
+        menubar = settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
                       lambda: check_updates(self.root, APP, self.tr))
+        menu = self.root.nametowidget(menubar.entrycget(0, 'menu'))
+        menu.add_separator(); menu.add_checkbutton(label=t('game_sound_english'), variable=self.sound_enabled, command=self.change_sound)
         frame = ttk.LabelFrame(self.root, text=t('run_experiment'), padding=12); frame.pack(fill='x', padx=12, pady=5)
         ttk.Label(frame, text=t('trial_count')).grid(row=0,column=0); ttk.Entry(frame, textvariable=self.count,width=10).grid(row=0,column=1,padx=8)
         ttk.Radiobutton(frame,text=t('switch'),variable=self.strategy,value='switch').grid(row=0,column=2)
@@ -69,8 +73,8 @@ class App:
         ttk.Label(settings,text=t('round_count')).pack(side='left',padx=4)
         ttk.Entry(settings,textvariable=self.round_count,width=6).pack(side='left',padx=4)
         ttk.Label(settings,text=t('host_label')).pack(side='left',padx=(18,4))
-        self.host_choice = ttk.Combobox(settings, values=(t('host_1'),t('host_2')), state='readonly', width=12)
-        self.host_choice.current(0 if self.host == 'host1' else 1); self.host_choice.pack(side='left',padx=4)
+        self.host_choice = ttk.Combobox(settings, values=(t('host_1'),t('host_2'),t('host_3')), state='readonly', width=12)
+        self.host_choice.current(('host1','host2','host3').index(self.host)); self.host_choice.pack(side='left',padx=4)
         self.host_choice.bind('<<ComboboxSelected>>', self.change_host)
         self.start_button = ttk.Button(settings,text=t('live_game'),command=self.start_game); self.start_button.pack(side='left',padx=10)
         ttk.Style(self.root).configure('Save.TCheckbutton', wraplength=740)
@@ -132,7 +136,7 @@ class App:
         self.start_button.state(['disabled' if running else '!disabled'])
         self.save_checkbox.state(['disabled' if running else '!disabled'])
         host = 'thinking' if self.phase == 'choose' else ('win' if self.results[-1]['won'] else 'loss') if self.phase == 'result' and self.results else 'welcome'
-        self.host_image.configure(image=self.game_images[('host_' if self.host == 'host1' else 'host2_') + host])
+        self.host_image.configure(image=self.game_images[('host_' if self.host == 'host1' else self.host + '_') + host])
         for door, button in enumerate(self.door_buttons, 1):
             label=self.tr('door_number',number=door)
             if self.phase in ('choose','result'):
@@ -153,13 +157,22 @@ class App:
         elif self.phase == 'result' and self.results: self.show_result()
 
     def change_host(self, event=None):
-        self.host = 'host2' if self.host_choice.current() == 1 else 'host1'
+        self.host = ('host1','host2','host3')[self.host_choice.current()]
         self.save(); self.update_controls()
+
+    def change_sound(self):
+        if not self.sound_enabled.get(): self.sound_player.stop()
+        self.save()
+
+    def play_sound(self, cue):
+        if self.sound_enabled.get():
+            voice = {'host1':'female1', 'host2':'female2', 'host3':'male'}[self.host]
+            self.sound_player.play(voice + '_' + cue if cue in ('choose','door1','door2','door3') else cue)
 
     def set_language(self, code): self.tr = Translator(code); self.save(); self.build()
     def set_theme(self, theme): self.theme = theme; self.save(); self.build()
-    def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme,'save_live':self.save_live.get(),'host':self.host})
-    def close(self): self.save(); self.root.destroy()
+    def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme,'save_live':self.save_live.get(),'host':self.host,'sound_enabled':self.sound_enabled.get()})
+    def close(self): self.sound_player.stop(); self.save(); self.root.destroy()
 
     def run_experiment(self):
         if self.job: return
@@ -202,7 +215,7 @@ class App:
                 messagebox.showerror(self.tr('error'), str(exc), parent=self.root); return
         self.rounds = rounds; self.results = []; self.round_index = 0; self.phase = 'pick'; self.record_path = path; self.session_saving = saving
         self.session = {'date': datetime.now().isoformat(timespec='seconds'), 'record_path': path, 'rounds': self.results}
-        self.update_controls()
+        self.update_controls(); self.play_sound('choose')
 
     def show_round(self):
         r=self.rounds[self.round_index]
@@ -214,7 +227,7 @@ class App:
     def select_door(self, door):
         if self.phase != 'pick': return
         self.rounds[self.round_index] = choose_live_door(self.rounds[self.round_index], door)
-        self.phase = 'choose'; self.update_controls()
+        self.phase = 'choose'; self.update_controls(); self.play_sound('door' + str(self.rounds[self.round_index]['revealed']))
 
     def play(self, strategy):
         if self.phase != 'choose': return
@@ -229,7 +242,7 @@ class App:
             self.persist_history()
         limit_live_rounds(self.unsaved_sessions)
         self.refresh_history(); self.logs.select(1)
-        self.phase='result'; self.show_result(); self.update_controls()
+        self.phase='result'; self.show_result(); self.update_controls(); self.play_sound('success' if self.results[-1]['won'] else 'failure')
 
     def show_result(self):
         r=self.results[-1]
@@ -237,7 +250,7 @@ class App:
 
     def next_round(self):
         if self.phase != 'result' or self.round_index+1 >= len(self.rounds): return
-        self.round_index += 1; self.phase='pick'; self.update_controls()
+        self.round_index += 1; self.phase='pick'; self.update_controls(); self.play_sound('choose')
 
 if __name__ == '__main__':
     if not helper_mode(APP):

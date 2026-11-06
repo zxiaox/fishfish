@@ -144,5 +144,7 @@
   "host_label": "พิธีกร",
   "host_1": "พิธีกร 1",
   "host_2": "พิธีกร 2",
-  "eliminated_by_host": "พิธีกรตัดออก"
+  "eliminated_by_host": "พิธีกรตัดออก",
+  "host_3": "พิธีกร 3",
+  "game_sound_english": "เสียงเกมและเสียงพูดภาษาอังกฤษ"
 }

@@ -144,5 +144,7 @@
   "host_label": "主持人",
   "host_1": "主持人 1",
   "host_2": "主持人 2",
-  "eliminated_by_host": "主持人淘汰"
+  "eliminated_by_host": "主持人淘汰",
+  "host_3": "主持人 3",
+  "game_sound_english": "游戏音效和英语语音"
 }
