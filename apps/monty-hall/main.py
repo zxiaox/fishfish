@@ -202,8 +202,6 @@ class App:
                 messagebox.showerror(self.tr('error'), str(exc), parent=self.root); return
         self.rounds = rounds; self.results = []; self.round_index = 0; self.phase = 'pick'; self.record_path = path; self.session_saving = saving
         self.session = {'date': datetime.now().isoformat(timespec='seconds'), 'record_path': path, 'rounds': self.results}
-        if saving:
-            messagebox.showinfo(self.tr('live_game'), self.tr('record_saved', path=path), parent=self.root)
         self.update_controls()
 
     def show_round(self):

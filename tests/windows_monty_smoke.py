@@ -14,7 +14,8 @@ with tempfile.TemporaryDirectory() as directory:
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     record = Path(directory) / 'rounds.txt'
     module.filedialog.asksaveasfilename = lambda **kwargs: str(record)
-    module.messagebox.showinfo = lambda *args, **kwargs: None
+    info_messages = []
+    module.messagebox.showinfo = lambda *args, **kwargs: info_messages.append((args, kwargs))
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
     assert app.phase == 'idle' and all('disabled' not in b.state() for b in app.door_buttons)
     app.door_buttons[0].invoke(); assert app.phase == 'idle'
@@ -26,6 +27,7 @@ with tempfile.TemporaryDirectory() as directory:
     def shown(widget): return str(root.tk.splitlist(widget.cget('image'))[0])
     app.round_count.set('2'); app.start_button.invoke()
     assert app.phase == 'pick' and all('disabled' not in b.state() for b in app.door_buttons)
+    assert not info_messages, 'Starting a saved session should not show a confirmation popup'
     assert shown(app.host_image) == str(app.game_images['host_welcome'])
     assert all(shown(b) == str(app.game_images['doors_closed']) for b in app.door_buttons)
     assert len(list(Path(directory).glob('*.txt'))) == 1
