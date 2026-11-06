@@ -143,5 +143,6 @@
   "door_revealed_prompt": "Round {number} of {total}: You chose door {choice}. Door {revealed} is empty. Switch or stay?",
   "host_label": "Host",
   "host_1": "Host 1",
-  "host_2": "Host 2"
+  "host_2": "Host 2",
+  "eliminated_by_host": "Eliminated by the host"
 }

@@ -143,5 +143,6 @@
   "door_revealed_prompt": "第 {number} / {total} 轮：你选择了 {choice} 号门。{revealed} 号门是空的。换门还是坚持？",
   "host_label": "主持人",
   "host_1": "主持人 1",
-  "host_2": "主持人 2"
+  "host_2": "主持人 2",
+  "eliminated_by_host": "主持人淘汰"
 }

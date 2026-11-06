@@ -137,9 +137,9 @@ class App:
             label=self.tr('door_number',number=door)
             if self.phase in ('choose','result'):
                 r=self.results[-1] if self.phase == 'result' else self.rounds[self.round_index]
-                if self.phase=='result' and door==r['prize']: label += ' · ' + self.tr('prize')
+                if door==r['revealed']: label += ' · ' + self.tr('empty') + '\n' + self.tr('eliminated_by_host')
+                elif self.phase=='result' and door==r['prize']: label += ' · ' + self.tr('prize')
                 elif self.phase=='result' and door==r['final']: label += ' · ' + self.tr('empty')
-                elif self.phase=='choose' and door==r['revealed']: label += ' · ' + self.tr('empty')
                 if door==r['choice']: label += ' · ' + self.tr('door_selected')
             door_image = 'closed'
             if self.phase in ('choose', 'result') and door == self.rounds[self.round_index]['revealed']:

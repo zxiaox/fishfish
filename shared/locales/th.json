@@ -143,5 +143,6 @@
   "door_revealed_prompt": "รอบที่ {number} จาก {total}: คุณเลือกประตู {choice} ประตู {revealed} ว่างเปล่า จะเปลี่ยนหรืออยู่ต่อ?",
   "host_label": "พิธีกร",
   "host_1": "พิธีกร 1",
-  "host_2": "พิธีกร 2"
+  "host_2": "พิธีกร 2",
+  "eliminated_by_host": "พิธีกรตัดออก"
 }

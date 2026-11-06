@@ -143,5 +143,6 @@
   "door_revealed_prompt": "第 {number} / {total} ラウンド：ドア {choice} を選択。ドア {revealed} は空です。変更しますか？",
   "host_label": "司会者",
   "host_1": "司会者 1",
-  "host_2": "司会者 2"
+  "host_2": "司会者 2",
+  "eliminated_by_host": "司会者が除外"
 }

@@ -143,5 +143,6 @@
   "door_revealed_prompt": "Runde {number} von {total}: Du hast Tür {choice} gewählt. Tür {revealed} ist leer. Wechseln oder bleiben?",
   "host_label": "Moderation",
   "host_1": "Moderatorin 1",
-  "host_2": "Moderatorin 2"
+  "host_2": "Moderatorin 2",
+  "eliminated_by_host": "Von der Moderation ausgeschlossen"
 }

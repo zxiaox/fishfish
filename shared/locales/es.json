@@ -143,5 +143,6 @@
   "door_revealed_prompt": "Ronda {number} de {total}: Elegiste la puerta {choice}. La puerta {revealed} está vacía. ¿Cambiar o mantener?",
   "host_label": "Presentadora",
   "host_1": "Presentadora 1",
-  "host_2": "Presentadora 2"
+  "host_2": "Presentadora 2",
+  "eliminated_by_host": "Eliminada por la presentadora"
 }

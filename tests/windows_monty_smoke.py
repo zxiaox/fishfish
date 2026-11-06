@@ -37,6 +37,14 @@ with tempfile.TemporaryDirectory() as directory:
     assert shown(app.host_image) == str(app.game_images['host_thinking'])
     revealed = app.rounds[0]['revealed']
     assert shown(app.door_buttons[revealed-1]) == str(app.game_images['doors_empty'])
+    def assert_revealed_label():
+        label = str(app.door_buttons[revealed-1].cget('text'))
+        assert app.tr('door_number', number=revealed) in label
+        assert app.tr('empty') in label and app.tr('eliminated_by_host') in label
+    for lang in ('en', 'zh', 'ko', 'ja', 'th', 'de', 'es'):
+        app.set_language(lang); assert_revealed_label()
+    app.set_language('en')
+    assert_revealed_label()
     assert all(shown(b) == str(app.game_images['doors_closed']) for i,b in enumerate(app.door_buttons, 1) if i != revealed)
     app.host_choice.current(1); app.change_host()
     assert app.host == 'host2' and module.load_settings(module.APP)['host'] == 'host2'
@@ -55,6 +63,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert shown(app.host_image) == str(app.game_images['host_win' if result['won'] else 'host_loss'])
     assert shown(app.door_buttons[result['final']-1]) == str(app.game_images['doors_treasure' if result['won'] else 'doors_empty'])
     assert shown(app.door_buttons[result['revealed']-1]) == str(app.game_images['doors_empty'])
+    assert_revealed_label()
     assert not result['won']
     assert shown(app.door_buttons[result['prize']-1]) == str(app.game_images['doors_treasure'])
     assert record.read_text(encoding='utf-8').startswith(before)

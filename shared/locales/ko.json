@@ -143,5 +143,6 @@
   "door_revealed_prompt": "{number} / {total} 라운드: {choice}번 문을 선택했습니다. {revealed}번 문은 비어 있습니다. 바꾸시겠습니까?",
   "host_label": "진행자",
   "host_1": "진행자 1",
-  "host_2": "진행자 2"
+  "host_2": "진행자 2",
+  "eliminated_by_host": "진행자가 제거함"
 }
