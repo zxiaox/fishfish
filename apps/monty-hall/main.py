@@ -60,7 +60,7 @@ class App:
         t = self.tr; self.root._fishfish_language = t.code; apply_theme(self.root, self.theme); self.root.title(t('monty_title')); self.root.geometry('980x940'); self.root.minsize(820, 780)
         menubar = settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
                       lambda: check_updates(self.root, APP, self.tr))
-        menu = self.root.nametowidget(menubar.entrycget(0, 'menu'))
+        menu = self.root.nametowidget(menubar.entrycget(t('settings'), 'menu'))
         menu.add_separator(); menu.add_checkbutton(label=t('game_sound_english'), variable=self.sound_enabled, command=self.change_sound)
         frame = ttk.LabelFrame(self.root, text=t('run_experiment'), padding=12); frame.pack(fill='x', padx=12, pady=5)
         ttk.Label(frame, text=t('trial_count')).grid(row=0,column=0); ttk.Entry(frame, textvariable=self.count,width=10).grid(row=0,column=1,padx=8)
