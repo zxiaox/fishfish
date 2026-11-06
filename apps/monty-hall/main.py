@@ -4,6 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import tkinter as tk
 from tkinter import ttk, filedialog
+from PIL import Image, ImageTk
 from shared import dialogs as messagebox
 from shared.common import Translator, load_settings, save_settings, settings_menu, config_dir, apply_theme, set_app_icon, resource_root
 from shared.updater import check_updates, helper_mode, cleanup_mode
@@ -15,8 +16,8 @@ APP = 'monty-hall'; MAX_TRIALS = 100000
 
 class App:
     def __init__(self, root):
-        self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light'); self.host = self.settings.get('host','host1')
-        if self.host not in ('host1', 'host2'): self.host = 'host1'
+        self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light'); self.host = self.settings.get('host','host2')
+        if self.host not in ('host1', 'host2'): self.host = 'host2'
         self.count = tk.StringVar(value='1000'); self.round_count = tk.StringVar(value='5'); self.strategy = tk.StringVar(value='switch')
         self.save_live = tk.BooleanVar(value=self.settings.get('save_live', True)); self.session_saving = False; self.unsaved_sessions = []
         self.summary = tk.StringVar(); self.live_text = tk.StringVar(); self.rounds = []; self.results = []; self.round_index = 0; self.job = None; self.phase = 'idle'
@@ -32,20 +33,25 @@ class App:
         root.protocol('WM_DELETE_WINDOW', self.close)
 
     def load_game_images(self):
-        """Slice the generated 2×2 sheets in memory and keep Tk images alive."""
+        """Resize host art with high-quality filtering and keep Tk images alive."""
         self.image_sheets = {}; self.game_images = {}
-        for sheet, names in (('host', ('welcome','thinking','win','loss')),
-                             ('host2', ('welcome','thinking','win','loss')),
-                             ('doors', ('closed','closed_alt','empty','treasure'))):
-            source = tk.PhotoImage(master=self.root, file=str(resource_root() / 'assets' / 'monty-hall-game' / (sheet + '.png')))
-            self.image_sheets[sheet] = source
-            width, height = source.width() // 2, source.height() // 2
-            step = max(1, (width + 159) // 160)
-            for index, name in enumerate(names):
-                x, y = (index % 2) * width, (index // 2) * height
-                image = tk.PhotoImage(master=self.root)
-                image.tk.call(image, 'copy', source, '-from', x, y, x + width, y + height, '-subsample', step, step)
-                self.game_images[sheet + '_' + name] = image
+        for sheet in ('host', 'host2'):
+            with Image.open(resource_root() / 'assets' / 'monty-hall-game' / (sheet + '.png')) as source:
+                width, height = source.width // 2, source.height // 2
+                for index, name in enumerate(('welcome', 'thinking', 'win', 'loss')):
+                    x, y = (index % 2) * width, (index // 2) * height
+                    cropped = source.crop((x, y, x + width, y + height))
+                    resized = cropped.resize((200, 200), Image.Resampling.LANCZOS)
+                    self.game_images[sheet + '_' + name] = ImageTk.PhotoImage(resized, master=self.root)
+        source = tk.PhotoImage(master=self.root, file=str(resource_root() / 'assets' / 'monty-hall-game' / 'doors.png'))
+        self.image_sheets['doors'] = source
+        width, height = source.width() // 2, source.height() // 2
+        step = max(1, (width + 159) // 160)
+        for index, name in enumerate(('closed', 'closed_alt', 'empty', 'treasure')):
+            x, y = (index % 2) * width, (index // 2) * height
+            image = tk.PhotoImage(master=self.root)
+            image.tk.call(image, 'copy', source, '-from', x, y, x + width, y + height, '-subsample', step, step)
+            self.game_images['doors_' + name] = image
 
     def build(self):
         for child in self.root.winfo_children(): child.destroy()

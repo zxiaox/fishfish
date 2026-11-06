@@ -1,9 +1,9 @@
-"""Collect the license texts for bundled War3 dependencies."""
+"""Collect the license texts for bundled dependencies."""
 from importlib import metadata
 from pathlib import Path
 
 output = []
-for name in ('cryptography', 'cffi', 'pycparser'):
+for name in ('cryptography', 'cffi', 'pycparser', 'pillow'):
     distribution = metadata.distribution(name)
     output.append(f'===== {name} {distribution.version} =====\n')
     paths = [item for item in distribution.files or [] if '.dist-info/' in str(item).replace('\\', '/') and 'license' in str(item).lower() and Path(item).name.lower().startswith(('license', 'copying'))]

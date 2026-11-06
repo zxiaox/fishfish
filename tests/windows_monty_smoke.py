@@ -16,6 +16,11 @@ with tempfile.TemporaryDirectory() as directory:
     module.filedialog.asksaveasfilename = lambda **kwargs: str(record)
     module.messagebox.showinfo = lambda *args, **kwargs: None
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
+    assert app.host == 'host2'
+    assert app.game_images['host_welcome'].width() == 200
+    assert app.game_images['host2_welcome'].width() == 200
+    app.host_choice.current(0); app.change_host()
+    assert module.load_settings(module.APP)['host'] == 'host1'
     def shown(widget): return str(root.tk.splitlist(widget.cget('image'))[0])
     app.round_count.set('2'); app.start_button.invoke()
     assert app.phase == 'pick'
