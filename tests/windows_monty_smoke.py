@@ -29,7 +29,8 @@ with tempfile.TemporaryDirectory() as directory:
     assert len(list(Path(directory).glob('*.txt'))) == 1
     before = record.read_text(encoding='utf-8')
     assert before.count(app.tr('round_label', number=1)) == 1
-    app.door_buttons[0].invoke()
+    first_choice = app.rounds[0]['prize']
+    app.door_buttons[first_choice-1].invoke()
     assert app.phase == 'choose'
     assert shown(app.host_image) == str(app.game_images['host_thinking'])
     revealed = app.rounds[0]['revealed']
@@ -39,20 +40,27 @@ with tempfile.TemporaryDirectory() as directory:
     assert app.host == 'host2' and module.load_settings(module.APP)['host'] == 'host2'
     assert shown(app.host_image) == str(app.game_images['host2_thinking'])
     app.host_choice.current(0); app.change_host()
-    assert app.rounds[0]['choice'] == 1
-    assert app.rounds[0]['revealed'] not in (1, app.rounds[0]['prize'])
+    assert app.rounds[0]['choice'] == first_choice
+    assert app.rounds[0]['revealed'] not in (first_choice, app.rounds[0]['prize'])
+    assert all('disabled' not in button.state() for button in app.door_buttons)
+    app.door_buttons[revealed-1].invoke()
+    assert app.phase == 'choose' and app.rounds[0]['choice'] == first_choice
     app.switch_button.invoke()
     assert app.phase == 'result' and len(app.results) == 1
     result = app.results[-1]
     assert shown(app.host_image) == str(app.game_images['host_win' if result['won'] else 'host_loss'])
     assert shown(app.door_buttons[result['final']-1]) == str(app.game_images['doors_treasure' if result['won'] else 'doors_empty'])
     assert shown(app.door_buttons[result['revealed']-1]) == str(app.game_images['doors_empty'])
-    assert all(shown(b) == str(app.game_images['doors_closed']) for i,b in enumerate(app.door_buttons, 1) if i not in (result['final'], result['revealed']))
+    assert not result['won']
+    assert shown(app.door_buttons[result['prize']-1]) == str(app.game_images['doors_treasure'])
     assert record.read_text(encoding='utf-8').startswith(before)
     assert len(module.load_history(app.history_path)['live_sessions'][0]['rounds']) == 1
     app.next_button.invoke(); assert app.phase == 'pick'
     app.set_theme('dark'); app.set_theme('light')
-    app.door_buttons[1].invoke(); app.stay_button.invoke()
+    winning_choice = app.rounds[1]['prize']
+    app.door_buttons[winning_choice-1].invoke(); app.stay_button.invoke()
+    assert app.results[-1]['won']
+    assert shown(app.door_buttons[winning_choice-1]) == str(app.game_images['doors_treasure'])
     assert len(app.live_table.get_children()) == 2
     assert len(list(Path(directory).glob('*.txt'))) == 1
     app.close()

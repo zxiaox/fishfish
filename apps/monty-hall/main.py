@@ -134,18 +134,21 @@ class App:
         host = 'thinking' if self.phase == 'choose' else ('win' if self.results[-1]['won'] else 'loss') if self.phase == 'result' and self.results else 'welcome'
         self.host_image.configure(image=self.game_images[('host_' if self.host == 'host1' else 'host2_') + host])
         for door, button in enumerate(self.door_buttons, 1):
-            button.state(['!disabled' if self.phase=='pick' else 'disabled'])
+            button.state(['!disabled' if self.phase in ('pick', 'choose') else 'disabled'])
             label=self.tr('door_number',number=door)
             if self.phase in ('choose','result'):
                 r=self.results[-1] if self.phase == 'result' else self.rounds[self.round_index]
-                if self.phase=='result' and door==r['final']: label += ' · ' + self.tr('prize' if r['won'] else 'empty')
+                if self.phase=='result' and door==r['prize']: label += ' · ' + self.tr('prize')
+                elif self.phase=='result' and door==r['final']: label += ' · ' + self.tr('empty')
                 elif self.phase=='choose' and door==r['revealed']: label += ' · ' + self.tr('empty')
                 if door==r['choice']: label += ' · ' + self.tr('door_selected')
             door_image = 'closed'
             if self.phase in ('choose', 'result') and door == self.rounds[self.round_index]['revealed']:
                 door_image = 'empty'
             if self.phase == 'result' and door == self.results[-1]['final']:
-                door_image = 'treasure' if self.results[-1]['won'] else 'empty'
+                door_image = 'empty'
+            if self.phase == 'result' and door == self.results[-1]['prize']:
+                door_image = 'treasure'
             button.configure(text=label, image=self.game_images['doors_' + door_image])
         if self.phase in ('pick','choose'): self.show_round()
         elif self.phase == 'result' and self.results: self.show_result()
