@@ -124,7 +124,7 @@ class App:
             button.state(['!disabled' if self.phase=='pick' else 'disabled'])
             label=self.tr('door_number',number=door)
             if self.phase in ('choose','result'):
-                r=self.rounds[self.round_index]
+                r=self.results[-1] if self.phase == 'result' else self.rounds[self.round_index]
                 if self.phase=='result' and door==r['final']: label += ' · ' + self.tr('prize' if r['won'] else 'empty')
                 elif self.phase=='choose' and door==r['revealed']: label += ' · ' + self.tr('empty')
                 if door==r['choice']: label += ' · ' + self.tr('door_selected')
