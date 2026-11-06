@@ -146,5 +146,9 @@
   "host_2": "진행자 2",
   "eliminated_by_host": "진행자가 제거함",
   "host_3": "진행자 3",
-  "game_sound_english": "게임 효과음 및 영어 음성"
+  "game_sound": "게임 효과음 및 음성",
+  "voice_choose": "문을 하나 선택해 주세요.",
+  "voice_eliminated": "제가 {number}번 문을 제외했습니다. 문을 바꾸시겠어요?",
+  "voice_unavailable_title": "음성을 사용할 수 없음",
+  "voice_unavailable": "이 언어와 호환되는 Windows 음성을 찾지 못했습니다. 해당 Windows 텍스트 음성 변환 음성을 설치하고 게임을 다시 시작하세요."
 }

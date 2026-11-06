@@ -146,5 +146,9 @@
   "host_2": "Host 2",
   "eliminated_by_host": "Eliminated by the host",
   "host_3": "Host 3",
-  "game_sound_english": "Game sounds and English voice"
+  "game_sound": "Game sounds and voice",
+  "voice_choose": "Please choose a door.",
+  "voice_eliminated": "I have eliminated door {number} for you; would you like to switch doors?",
+  "voice_unavailable_title": "Voice unavailable",
+  "voice_unavailable": "No compatible Windows voice was found for this language. Install a matching Windows text-to-speech voice and restart the game."
 }

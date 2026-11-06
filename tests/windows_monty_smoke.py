@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import sys
 import tempfile
+import queue
 import tkinter as tk
 
 with tempfile.TemporaryDirectory() as directory:
@@ -18,13 +19,26 @@ with tempfile.TemporaryDirectory() as directory:
     module.messagebox.showinfo = lambda *args, **kwargs: info_messages.append((args, kwargs))
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
     class FakeSounds:
-        def __init__(self): self.calls = []
-        def play(self, name): self.calls.append(name)
+        def __init__(self): self.calls = []; self.events = queue.Queue()
+        def play(self, name, fallback_text=None): self.calls.append(name)
         def stop(self): self.calls.append('stop')
     app.sound_player = FakeSounds()
+    warnings = []; module.messagebox.showwarning = lambda *args, **kwargs: warnings.append((args, kwargs))
+    app.sound_player.events.put(('speech_unavailable', 'en')); app.poll_sound()
+    assert len(warnings) == 1
+    app.sound_player.events.put(('speech_unavailable', 'en')); app.poll_sound()
+    assert len(warnings) == 1
     assert app.phase == 'idle' and all('disabled' not in b.state() for b in app.door_buttons)
     app.door_buttons[0].invoke(); assert app.phase == 'idle'
     assert app.host == 'host2'
+    for lang in ('en','zh','ko','ja','th','de','es'):
+        app.tr = module.Translator(lang)
+        for host, voice in (('host1','female1'),('host2','female2'),('host3','male')):
+            app.host = host
+            for cue in ('choose','door1','door2','door3'):
+                app.play_sound(cue)
+                assert app.sound_player.calls[-1] == ('' if lang == 'en' else lang + '_') + voice + '_' + cue
+    app.host = 'host2'; app.tr = module.Translator('en')
     assert app.game_images['host_welcome'].width() == 200
     assert app.game_images['host2_welcome'].width() == 200
     app.host_choice.current(0); app.change_host()

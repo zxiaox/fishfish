@@ -1,4 +1,5 @@
 import sys
+import queue
 from datetime import datetime
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
@@ -20,7 +21,7 @@ class App:
         self.root = root; self.settings = load_settings(APP); self.tr = Translator(self.settings.get('language','en')); self.theme = self.settings.get('theme','light'); self.host = self.settings.get('host','host2')
         if self.host not in ('host1', 'host2', 'host3'): self.host = 'host2'
         self.count = tk.StringVar(value='1000'); self.round_count = tk.StringVar(value='5'); self.strategy = tk.StringVar(value='switch')
-        self.sound_enabled = tk.BooleanVar(value=self.settings.get('sound_enabled', True)); self.sound_player = SoundPlayer(resource_root() / 'assets' / 'monty-hall-game' / 'audio')
+        self.sound_enabled = tk.BooleanVar(value=self.settings.get('sound_enabled', True)); self.sound_player = SoundPlayer(resource_root() / 'assets' / 'monty-hall-game' / 'audio'); self.warned_voice_languages = set()
         self.save_live = tk.BooleanVar(value=self.settings.get('save_live', True)); self.session_saving = False; self.unsaved_sessions = []
         self.summary = tk.StringVar(); self.live_text = tk.StringVar(); self.rounds = []; self.results = []; self.round_index = 0; self.job = None; self.phase = 'idle'
         self.history_path = config_dir(APP) / 'history.json'
@@ -32,7 +33,7 @@ class App:
         self.load_game_images()
         set_app_icon(root, APP); self.build()
         if self.history_error: root.after(100, lambda: messagebox.showerror(self.tr('error'), self.tr('history_error', error=self.history_error), parent=self.root))
-        root.protocol('WM_DELETE_WINDOW', self.close)
+        root.protocol('WM_DELETE_WINDOW', self.close); root.after(250, self.poll_sound)
 
     def load_game_images(self):
         """Resize host art with high-quality filtering and keep Tk images alive."""
@@ -61,7 +62,7 @@ class App:
         menubar = settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
                       lambda: check_updates(self.root, APP, self.tr))
         menu = self.root.nametowidget(menubar.entrycget(t('settings'), 'menu'))
-        menu.add_separator(); menu.add_checkbutton(label=t('game_sound_english'), variable=self.sound_enabled, command=self.change_sound)
+        menu.add_separator(); menu.add_checkbutton(label=t('game_sound'), variable=self.sound_enabled, command=self.change_sound)
         frame = ttk.LabelFrame(self.root, text=t('run_experiment'), padding=12); frame.pack(fill='x', padx=12, pady=5)
         ttk.Label(frame, text=t('trial_count')).grid(row=0,column=0); ttk.Entry(frame, textvariable=self.count,width=10).grid(row=0,column=1,padx=8)
         ttk.Radiobutton(frame,text=t('switch'),variable=self.strategy,value='switch').grid(row=0,column=2)
@@ -167,9 +168,23 @@ class App:
     def play_sound(self, cue):
         if self.sound_enabled.get():
             voice = {'host1':'female1', 'host2':'female2', 'host3':'male'}[self.host]
-            self.sound_player.play(voice + '_' + cue if cue in ('choose','door1','door2','door3') else cue)
+            if cue in ('choose','door1','door2','door3'):
+                prefix = '' if self.tr.code == 'en' else self.tr.code + '_'
+                text = self.tr('voice_choose') if cue == 'choose' else self.tr('voice_eliminated', number=int(cue[-1]))
+                self.sound_player.play(prefix + voice + '_' + cue, fallback_text=text)
+            else: self.sound_player.play(cue)
 
-    def set_language(self, code): self.tr = Translator(code); self.save(); self.build()
+    def poll_sound(self):
+        try:
+            while True:
+                kind, language = self.sound_player.events.get_nowait()
+                if kind == 'speech_unavailable' and language == self.tr.code and language not in self.warned_voice_languages and self.sound_enabled.get():
+                    self.warned_voice_languages.add(language)
+                    messagebox.showwarning(self.tr('voice_unavailable_title'), self.tr('voice_unavailable'), parent=self.root)
+        except queue.Empty: pass
+        self.root.after(250, self.poll_sound)
+
+    def set_language(self, code): self.sound_player.stop(); self.tr = Translator(code); self.save(); self.build()
     def set_theme(self, theme): self.theme = theme; self.save(); self.build()
     def save(self): save_settings(APP, {'language':self.tr.code,'theme':self.theme,'save_live':self.save_live.get(),'host':self.host,'sound_enabled':self.sound_enabled.get()})
     def close(self): self.sound_player.stop(); self.save(); self.root.destroy()

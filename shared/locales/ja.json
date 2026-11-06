@@ -146,5 +146,9 @@
   "host_2": "司会者 2",
   "eliminated_by_host": "司会者が除外",
   "host_3": "司会者 3",
-  "game_sound_english": "ゲーム効果音と英語音声"
+  "game_sound": "ゲーム効果音と音声",
+  "voice_choose": "ドアを一つ選んでください。",
+  "voice_eliminated": "{number}番のドアを除外しました。ドアを変更しますか？",
+  "voice_unavailable_title": "音声を利用できません",
+  "voice_unavailable": "この言語に対応する Windows 音声が見つかりません。対応する Windows の音声合成音声をインストールしてゲームを再起動してください。"
 }

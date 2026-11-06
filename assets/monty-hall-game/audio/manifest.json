@@ -1,0 +1,221 @@
+{
+  "provider": "HeyGen",
+  "clips": [
+    {
+      "name": "zh_female1_door1",
+      "language": "zh",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "我已经为你排除了1号门，你想换一扇门吗？",
+      "duration": 3.5526530612244898,
+      "engine": "orca",
+      "request_id": "670104ac88bd4e1c8584abe47b7a1af4"
+    },
+    {
+      "name": "zh_female1_door2",
+      "language": "zh",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "我已经为你排除了2号门，你想换一扇门吗？",
+      "duration": 3.500408163265306,
+      "engine": "orca",
+      "request_id": "97b2b07a36cf491fa0613b7bdcaa8560"
+    },
+    {
+      "name": "zh_female1_door3",
+      "language": "zh",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "我已经为你排除了3号门，你想换一扇门吗？",
+      "duration": 3.709387755102041,
+      "engine": "orca",
+      "request_id": "2e1398a44fdc42728e1e31ce708fd17a"
+    },
+    {
+      "name": "zh_female2_choose",
+      "language": "zh",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "请选择一扇门。",
+      "duration": 1.750204081632653,
+      "engine": "orca",
+      "request_id": "66cf4c5c46d848aab1527e96bb457943"
+    },
+    {
+      "name": "zh_female2_door1",
+      "language": "zh",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "我已经为你排除了1号门，你想换一扇门吗？",
+      "duration": 3.709387755102041,
+      "engine": "orca",
+      "request_id": "d95cf77f35c847ea86a9ef814e9c4745"
+    },
+    {
+      "name": "zh_female2_door2",
+      "language": "zh",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "我已经为你排除了2号门，你想换一扇门吗？",
+      "duration": 3.657142857142857,
+      "engine": "orca",
+      "request_id": "f4ffe6dc30a14a13836f66717eaac271"
+    },
+    {
+      "name": "zh_female2_door3",
+      "language": "zh",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "我已经为你排除了3号门，你想换一扇门吗？",
+      "duration": 3.657142857142857,
+      "engine": "orca",
+      "request_id": "f90f5c8daaff496781337be702b92d61"
+    },
+    {
+      "name": "zh_male_choose",
+      "language": "zh",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "请选择一扇门。",
+      "duration": 1.7240816326530612,
+      "engine": "orca",
+      "request_id": "6879f671e40c4a098dd7f5cfa0befd34"
+    },
+    {
+      "name": "zh_male_door1",
+      "language": "zh",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "我已经为你排除了1号门，你想换一扇门吗？",
+      "duration": 3.422040816326531,
+      "engine": "orca",
+      "request_id": "2e8768c72afa4623adc6b8d3f9eed408"
+    },
+    {
+      "name": "zh_male_door2",
+      "language": "zh",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "我已经为你排除了2号门，你想换一扇门吗？",
+      "duration": 3.500408163265306,
+      "engine": "orca",
+      "request_id": "3c6966fedbae4ec69dc70c9196a06b32"
+    },
+    {
+      "name": "zh_male_door3",
+      "language": "zh",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "我已经为你排除了3号门，你想换一扇门吗？",
+      "duration": 3.213061224489796,
+      "engine": "orca",
+      "request_id": "155b0e903f7342348d6bbd219768d597"
+    },
+    {
+      "name": "ko_female1_choose",
+      "language": "ko",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "문을 하나 선택해 주세요.",
+      "duration": 2.1681632653061222,
+      "engine": "orca",
+      "request_id": "42945a33c23941d493029389300162a6"
+    },
+    {
+      "name": "ko_female1_door1",
+      "language": "ko",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "제가 1번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 3.8922448979591837,
+      "engine": "orca",
+      "request_id": "f3a428216ef54c09936ef5308a840f2d"
+    },
+    {
+      "name": "ko_female1_door2",
+      "language": "ko",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "제가 2번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 4.179591836734694,
+      "engine": "orca",
+      "request_id": "e6c68eedc0694cc39f17418379401aac"
+    },
+    {
+      "name": "ko_female1_door3",
+      "language": "ko",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "제가 3번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 4.048979591836734,
+      "engine": "orca",
+      "request_id": "88a49155499a47059e66f5d77864ecca"
+    },
+    {
+      "name": "ko_female2_choose",
+      "language": "ko",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "문을 하나 선택해 주세요.",
+      "duration": 1.8546938775510204,
+      "engine": "orca",
+      "request_id": "b7b55af368054eeeb2773d3dba3429b2"
+    },
+    {
+      "name": "ko_female2_door1",
+      "language": "ko",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "제가 1번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 4.25795918367347,
+      "engine": "orca",
+      "request_id": "c19cf2ba118e47f39e8d014f13e1d543"
+    },
+    {
+      "name": "ko_female2_door2",
+      "language": "ko",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "제가 2번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 4.179591836734694,
+      "engine": "orca",
+      "request_id": "4e1aa154f7ef4423bd8fce2a740f1e62"
+    },
+    {
+      "name": "ko_female2_door3",
+      "language": "ko",
+      "voiceId": "776f9d2ff401499a8f1f2bcb4ca46004",
+      "text": "제가 3번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 4.25795918367347,
+      "engine": "orca",
+      "request_id": "2e239463c2b544c48028e6c5b447728e"
+    },
+    {
+      "name": "ko_male_choose",
+      "language": "ko",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "문을 하나 선택해 주세요.",
+      "duration": 2.0114285714285716,
+      "engine": "orca",
+      "request_id": "8f7269d4641d4840b076e0c3228693ab"
+    },
+    {
+      "name": "ko_male_door1",
+      "language": "ko",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "제가 1번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 3.657142857142857,
+      "engine": "orca",
+      "request_id": "6a304bf32ee04dc68635620cf83d2fd9"
+    },
+    {
+      "name": "ko_male_door2",
+      "language": "ko",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "제가 2번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 3.9706122448979593,
+      "engine": "orca",
+      "request_id": "09c0cf2fb9fe49b099430451db2bb447"
+    },
+    {
+      "name": "ko_male_door3",
+      "language": "ko",
+      "voiceId": "b5c5b28db1ea408abc7d851202983bdb",
+      "text": "제가 3번 문을 제외했습니다. 문을 바꾸시겠어요?",
+      "duration": 3.657142857142857,
+      "engine": "orca",
+      "request_id": "665a8805a4554db9affaa4b305226ab5"
+    },
+    {
+      "name": "zh_female1_choose",
+      "language": "zh",
+      "voiceId": "4270665fc47f44aa989c093bb3dc2b99",
+      "text": "请选择一扇门。",
+      "duration": 1.5151020408163265,
+      "engine": "orca",
+      "request_id": "d2edb68e261d40258e3943fb158a6f8b"
+    }
+  ]
+}

@@ -146,5 +146,9 @@
   "host_2": "Moderatorin 2",
   "eliminated_by_host": "Von der Moderation ausgeschlossen",
   "host_3": "Moderator 3",
-  "game_sound_english": "Spielklänge und englische Sprachausgabe"
+  "game_sound": "Spielklänge und Sprachausgabe",
+  "voice_choose": "Bitte wählen Sie eine Tür.",
+  "voice_eliminated": "Ich habe Tür {number} für Sie ausgeschlossen. Möchten Sie die Tür wechseln?",
+  "voice_unavailable_title": "Sprachausgabe nicht verfügbar",
+  "voice_unavailable": "Für diese Sprache wurde keine kompatible Windows-Stimme gefunden. Installieren Sie eine passende Windows-Sprachausgabe und starten Sie das Spiel neu."
 }

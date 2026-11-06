@@ -146,5 +146,9 @@
   "host_2": "Presentadora 2",
   "eliminated_by_host": "Eliminada por la presentadora",
   "host_3": "Presentador 3",
-  "game_sound_english": "Sonidos del juego y voz en inglés"
+  "game_sound": "Sonidos y voz del juego",
+  "voice_choose": "Por favor, elige una puerta.",
+  "voice_eliminated": "He eliminado la puerta {number} por ti. ¿Quieres cambiar de puerta?",
+  "voice_unavailable_title": "Voz no disponible",
+  "voice_unavailable": "No se encontró una voz de Windows compatible con este idioma. Instala una voz de texto a voz de Windows y reinicia el juego."
 }
