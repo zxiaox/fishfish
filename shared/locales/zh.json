@@ -150,5 +150,11 @@
   "voice_choose": "请选择一扇门。",
   "voice_eliminated": "我已经为你排除了{number}号门，你想换一扇门吗？",
   "voice_unavailable_title": "语音不可用",
-  "voice_unavailable": "未找到此语言的 Windows 语音。请安装对应的 Windows 文本转语音声音，然后重启游戏。"
+  "voice_unavailable": "未找到此语言的 Windows 语音。请安装对应的 Windows 文本转语音声音，然后重启游戏。",
+  "countdown_enable": "启用倒计时",
+  "countdown_duration": "时长（小时:分钟:秒）",
+  "countdown_restart": "确认后重新开始倒计时",
+  "countdown_display": "倒计时：{time}",
+  "countdown_error": "请输入 00:00:01 至 999:59:59 之间的时长，格式为小时:分钟:秒。",
+  "work_countdown_settings": "工作与倒计时"
 }

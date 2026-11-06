@@ -150,5 +150,11 @@
   "voice_choose": "문을 하나 선택해 주세요.",
   "voice_eliminated": "제가 {number}번 문을 제외했습니다. 문을 바꾸시겠어요?",
   "voice_unavailable_title": "음성을 사용할 수 없음",
-  "voice_unavailable": "이 언어와 호환되는 Windows 음성을 찾지 못했습니다. 해당 Windows 텍스트 음성 변환 음성을 설치하고 게임을 다시 시작하세요."
+  "voice_unavailable": "이 언어와 호환되는 Windows 음성을 찾지 못했습니다. 해당 Windows 텍스트 음성 변환 음성을 설치하고 게임을 다시 시작하세요.",
+  "countdown_enable": "카운트다운 사용",
+  "countdown_duration": "시간 (시:분:초)",
+  "countdown_restart": "확인 시 카운트다운 다시 시작",
+  "countdown_display": "카운트다운: {time}",
+  "countdown_error": "00:00:01부터 999:59:59까지의 시간을 시:분:초 형식으로 입력하세요.",
+  "work_countdown_settings": "근무 및 카운트다운"
 }

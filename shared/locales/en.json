@@ -150,5 +150,11 @@
   "voice_choose": "Please choose a door.",
   "voice_eliminated": "I have eliminated door {number} for you; would you like to switch doors?",
   "voice_unavailable_title": "Voice unavailable",
-  "voice_unavailable": "No compatible Windows voice was found for this language. Install a matching Windows text-to-speech voice and restart the game."
+  "voice_unavailable": "No compatible Windows voice was found for this language. Install a matching Windows text-to-speech voice and restart the game.",
+  "countdown_enable": "Enable countdown",
+  "countdown_duration": "Duration (hours:minutes:seconds)",
+  "countdown_restart": "Restart countdown on confirmation",
+  "countdown_display": "Countdown: {time}",
+  "countdown_error": "Enter a duration from 00:00:01 to 999:59:59, using hours:minutes:seconds.",
+  "work_countdown_settings": "Work and countdown"
 }

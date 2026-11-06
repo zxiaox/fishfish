@@ -23,6 +23,9 @@ jobs:
       - name: Windows UI startup smoke test
         if: matrix.app == 'war3-battle-platform'
         run: python tests/windows_war3_smoke.py
+      - name: Windows Work Motivator countdown smoke test
+        if: matrix.app == 'work-motivator'
+        run: python tests/windows_work_smoke.py
       - name: Windows Three Doors interaction smoke test
         if: matrix.app == 'monty-hall'
         run: python tests/windows_monty_smoke.py

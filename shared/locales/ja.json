@@ -150,5 +150,11 @@
   "voice_choose": "ドアを一つ選んでください。",
   "voice_eliminated": "{number}番のドアを除外しました。ドアを変更しますか？",
   "voice_unavailable_title": "音声を利用できません",
-  "voice_unavailable": "この言語に対応する Windows 音声が見つかりません。対応する Windows の音声合成音声をインストールしてゲームを再起動してください。"
+  "voice_unavailable": "この言語に対応する Windows 音声が見つかりません。対応する Windows の音声合成音声をインストールしてゲームを再起動してください。",
+  "countdown_enable": "カウントダウンを有効にする",
+  "countdown_duration": "時間（時:分:秒）",
+  "countdown_restart": "確認時にカウントダウンを再開",
+  "countdown_display": "カウントダウン：{time}",
+  "countdown_error": "00:00:01 から 999:59:59 までの時間を 時:分:秒 の形式で入力してください。",
+  "work_countdown_settings": "勤務とカウントダウン"
 }

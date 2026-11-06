@@ -11,6 +11,7 @@ from shared.common import Translator, load_settings, save_settings, settings_men
 from shared.dialogs import center_window
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import work_status, work_interval, observed_work_by_day
+from countdown import DEFAULT_DURATION, parse_duration, new_deadline, remaining_text
 
 APP = 'work-motivator'
 
@@ -19,19 +20,24 @@ class App:
         self.root = root; self.settings = load_settings(APP)
         self.tr = Translator(self.settings.get('language', 'en')); self.theme = self.settings.get('theme', 'light')
         self.start = self.settings.get('start', '09:00'); self.end = self.settings.get('end', '17:00'); self.wage = self.settings.get('wage', '20')
+        self.countdown_enabled = self.settings.get('countdown_enabled', False) is True
+        self.countdown_duration = self.settings.get('countdown_duration', DEFAULT_DURATION)
+        try: parse_duration(self.countdown_duration)
+        except ValueError: self.countdown_duration = DEFAULT_DURATION
+        self.countdown_deadline = new_deadline(self.countdown_enabled, self.countdown_duration, self.countdown_enabled, self.countdown_duration, self.settings.get('countdown_deadline'), time.time())
         self.days = self.settings.get('worked_seconds', {}); self.last_wall = datetime.now(); self.last_mono = time.monotonic(); self.last_save = self.last_mono
-        self.remaining = tk.StringVar(); self.earned = tk.StringVar(); self.status = tk.StringVar(); self.rate = tk.StringVar(); self.month = tk.StringVar()
+        self.remaining = tk.StringVar(); self.earned = tk.StringVar(); self.status = tk.StringVar(); self.rate = tk.StringVar(); self.month = tk.StringVar(); self.countdown = tk.StringVar()
         set_app_icon(root, APP); self.build(); self.tick(); root.protocol('WM_DELETE_WINDOW', self.close)
         if not self.settings.get('configured'): root.after(100, self.open_settings)
 
     def build(self):
         for child in self.root.winfo_children(): child.destroy()
         apply_theme(self.root, self.theme); t = self.tr; self.root._fishfish_language = t.code
-        self.root.title(t('work_title')); self.root.geometry('560x380')
+        self.root.title(t('work_title')); self.root.geometry('560x440' if self.countdown_enabled else '560x380')
         top = ttk.Frame(self.root, padding=12); top.pack(fill='x')
         ttk.Label(top, text=t('work_title'), font=('', 16, 'bold')).pack(side='left')
         settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
-                      lambda: check_updates(self.root, APP, self.tr), self.open_settings)
+                      lambda: check_updates(self.root, APP, self.tr), self.open_settings, t('work_countdown_settings'))
         ttk.Label(self.root, textvariable=self.status, font=('', 13, 'bold')).pack(pady=(12, 5))
         ttk.Label(self.root, textvariable=self.remaining, font=('', 15)).pack(pady=5)
         ttk.Label(self.root, textvariable=self.earned, style='Earnings.TLabel').pack(pady=8)
@@ -39,22 +45,35 @@ class App:
         self.progress = ttk.Progressbar(self.root, maximum=100, style='Work.Horizontal.TProgressbar'); self.progress.pack(fill='x', padx=28, pady=12)
         ttk.Label(self.root, textvariable=self.month, font=('', 12)).pack(pady=4)
         ttk.Label(self.root, text=t('monthly_note'), wraplength=500).pack(pady=4)
+        if self.countdown_enabled:
+            ttk.Label(self.root, textvariable=self.countdown, font=('', 14, 'bold')).pack(pady=(12, 4))
 
     def open_settings(self):
         if hasattr(self, 'dialog') and self.dialog.winfo_exists(): self.dialog.lift(); return
         t = self.tr; dialog = self.dialog = tk.Toplevel(self.root); dialog.title(t('settings')); dialog.transient(self.root); dialog.resizable(False, False)
         form = ttk.Frame(dialog, padding=16); form.pack(fill='both', expand=True)
         start = tk.StringVar(value=self.start); end = tk.StringVar(value=self.end); wage = tk.StringVar(value=self.wage)
+        countdown_enabled = tk.BooleanVar(value=self.countdown_enabled); countdown_duration = tk.StringVar(value=self.countdown_duration); restart = tk.BooleanVar(value=False)
         for row, (label, var) in enumerate((('start_time', start), ('end_time', end), ('hourly_wage', wage))):
             ttk.Label(form, text=t(label)).grid(row=row, column=0, sticky='w', pady=6)
             ttk.Entry(form, textvariable=var, width=20).grid(row=row, column=1, sticky='ew', padx=12)
+        ttk.Separator(form).grid(row=3, column=0, columnspan=2, sticky='ew', pady=8)
+        ttk.Checkbutton(form, text=t('countdown_enable'), variable=countdown_enabled).grid(row=4, column=0, columnspan=2, sticky='w', pady=4)
+        ttk.Label(form, text=t('countdown_duration')).grid(row=5, column=0, sticky='w', pady=6)
+        ttk.Entry(form, textvariable=countdown_duration, width=20).grid(row=5, column=1, sticky='ew', padx=12)
+        ttk.Checkbutton(form, text=t('countdown_restart'), variable=restart).grid(row=6, column=0, columnspan=2, sticky='w', pady=4)
         def confirm():
             try: work_status(datetime.now(), start.get(), end.get(), wage.get())
             except (ValueError, ArithmeticError): messagebox.showerror(t('error'), t('work_error'), parent=dialog); return
+            duration = countdown_duration.get().strip()
+            try:
+                deadline = new_deadline(countdown_enabled.get(), duration, self.countdown_enabled, self.countdown_duration, self.countdown_deadline, time.time(), restart.get())
+            except (ValueError, ArithmeticError): messagebox.showerror(t('error'), t('countdown_error'), parent=dialog); return
+            self.countdown_enabled, self.countdown_duration, self.countdown_deadline = countdown_enabled.get(), duration, deadline
             self.start, self.end, self.wage = start.get(), end.get(), wage.get()
             self.settings['configured'] = True
             self.last_wall = datetime.now(); self.last_mono = time.monotonic(); self.save(); dialog.destroy(); self.build()
-        ttk.Button(form, text=t('confirm'), command=confirm).grid(row=3,column=1,pady=10)
+        ttk.Button(form, text=t('confirm'), command=confirm).grid(row=7,column=1,pady=10)
         center_window(dialog, self.root)
 
     def set_language(self, code):
@@ -81,13 +100,15 @@ class App:
             self.month.set(self.tr('month_hours', hours=f'{sum(float(v) for k,v in self.days.items() if k.startswith(now.strftime("%Y-%m-")))/3600:.2f}'))
             self.progress['value'] = progress*100
         except (ValueError, ArithmeticError, TypeError): self.status.set(self.tr('work_error'))
+        if self.countdown_enabled and self.countdown_deadline is not None:
+            self.countdown.set(self.tr('countdown_display', time=remaining_text(self.countdown_deadline, time.time())))
         self.last_wall = now; self.last_mono = mono
         if mono - self.last_save > 10:
             self.save(); self.last_save = mono
         self.root.after(25, self.tick)
 
     def save(self):
-        self.settings.update({'language': self.tr.code, 'theme': self.theme, 'start': self.start, 'end': self.end, 'wage': self.wage, 'worked_seconds': self.days}); save_settings(APP, self.settings)
+        self.settings.update({'language': self.tr.code, 'theme': self.theme, 'start': self.start, 'end': self.end, 'wage': self.wage, 'worked_seconds': self.days, 'countdown_enabled': self.countdown_enabled, 'countdown_duration': self.countdown_duration, 'countdown_deadline': self.countdown_deadline}); save_settings(APP, self.settings)
 
     def close(self): self.save(); self.root.destroy()
 

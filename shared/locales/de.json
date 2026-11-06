@@ -150,5 +150,11 @@
   "voice_choose": "Bitte wählen Sie eine Tür.",
   "voice_eliminated": "Ich habe Tür {number} für Sie ausgeschlossen. Möchten Sie die Tür wechseln?",
   "voice_unavailable_title": "Sprachausgabe nicht verfügbar",
-  "voice_unavailable": "Für diese Sprache wurde keine kompatible Windows-Stimme gefunden. Installieren Sie eine passende Windows-Sprachausgabe und starten Sie das Spiel neu."
+  "voice_unavailable": "Für diese Sprache wurde keine kompatible Windows-Stimme gefunden. Installieren Sie eine passende Windows-Sprachausgabe und starten Sie das Spiel neu.",
+  "countdown_enable": "Countdown aktivieren",
+  "countdown_duration": "Dauer (Stunden:Minuten:Sekunden)",
+  "countdown_restart": "Countdown beim Bestätigen neu starten",
+  "countdown_display": "Countdown: {time}",
+  "countdown_error": "Geben Sie eine Dauer von 00:00:01 bis 999:59:59 im Format Stunden:Minuten:Sekunden ein.",
+  "work_countdown_settings": "Arbeit und Countdown"
 }
