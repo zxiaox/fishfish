@@ -134,7 +134,6 @@ class App:
         host = 'thinking' if self.phase == 'choose' else ('win' if self.results[-1]['won'] else 'loss') if self.phase == 'result' and self.results else 'welcome'
         self.host_image.configure(image=self.game_images[('host_' if self.host == 'host1' else 'host2_') + host])
         for door, button in enumerate(self.door_buttons, 1):
-            button.state(['!disabled' if self.phase in ('pick', 'choose') else 'disabled'])
             label=self.tr('door_number',number=door)
             if self.phase in ('choose','result'):
                 r=self.results[-1] if self.phase == 'result' else self.rounds[self.round_index]

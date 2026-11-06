@@ -16,6 +16,8 @@ with tempfile.TemporaryDirectory() as directory:
     module.filedialog.asksaveasfilename = lambda **kwargs: str(record)
     module.messagebox.showinfo = lambda *args, **kwargs: None
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
+    assert app.phase == 'idle' and all('disabled' not in b.state() for b in app.door_buttons)
+    app.door_buttons[0].invoke(); assert app.phase == 'idle'
     assert app.host == 'host2'
     assert app.game_images['host_welcome'].width() == 200
     assert app.game_images['host2_welcome'].width() == 200
@@ -23,7 +25,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert module.load_settings(module.APP)['host'] == 'host1'
     def shown(widget): return str(root.tk.splitlist(widget.cget('image'))[0])
     app.round_count.set('2'); app.start_button.invoke()
-    assert app.phase == 'pick'
+    assert app.phase == 'pick' and all('disabled' not in b.state() for b in app.door_buttons)
     assert shown(app.host_image) == str(app.game_images['host_welcome'])
     assert all(shown(b) == str(app.game_images['doors_closed']) for b in app.door_buttons)
     assert len(list(Path(directory).glob('*.txt'))) == 1
@@ -47,6 +49,8 @@ with tempfile.TemporaryDirectory() as directory:
     assert app.phase == 'choose' and app.rounds[0]['choice'] == first_choice
     app.switch_button.invoke()
     assert app.phase == 'result' and len(app.results) == 1
+    assert all('disabled' not in b.state() for b in app.door_buttons)
+    app.door_buttons[0].invoke(); assert app.phase == 'result' and len(app.results) == 1
     result = app.results[-1]
     assert shown(app.host_image) == str(app.game_images['host_win' if result['won'] else 'host_loss'])
     assert shown(app.door_buttons[result['final']-1]) == str(app.game_images['doors_treasure' if result['won'] else 'doors_empty'])
