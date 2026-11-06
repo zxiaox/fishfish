@@ -156,5 +156,16 @@
   "countdown_restart": "Reiniciar la cuenta atrás al confirmar",
   "countdown_display": "Cuenta atrás: {time}",
   "countdown_error": "Introduce una duración entre 00:00:01 y 999:59:59 con el formato horas:minutos:segundos.",
-  "work_countdown_settings": "Trabajo y cuenta atrás"
+  "work_countdown_settings": "Trabajo y cuenta atrás",
+  "calendar_date": "{date} · {weekday}",
+  "calendar_lunar": "Calendario lunar chino: {day}/{month}/{year}{leap}",
+  "calendar_leap": " (mes intercalar)",
+  "calendar_lunar_unavailable": "Fecha lunar china no disponible",
+  "weekday_0": "lunes",
+  "weekday_1": "martes",
+  "weekday_2": "miércoles",
+  "weekday_3": "jueves",
+  "weekday_4": "viernes",
+  "weekday_5": "sábado",
+  "weekday_6": "domingo"
 }

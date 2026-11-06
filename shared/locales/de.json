@@ -156,5 +156,16 @@
   "countdown_restart": "Countdown beim Bestätigen neu starten",
   "countdown_display": "Countdown: {time}",
   "countdown_error": "Geben Sie eine Dauer von 00:00:01 bis 999:59:59 im Format Stunden:Minuten:Sekunden ein.",
-  "work_countdown_settings": "Arbeit und Countdown"
+  "work_countdown_settings": "Arbeit und Countdown",
+  "calendar_date": "{date} · {weekday}",
+  "calendar_lunar": "Chinesischer Mondkalender: {day}.{month}.{year}{leap}",
+  "calendar_leap": " (Schaltmonat)",
+  "calendar_lunar_unavailable": "Chinesisches Monddatum nicht verfügbar",
+  "weekday_0": "Montag",
+  "weekday_1": "Dienstag",
+  "weekday_2": "Mittwoch",
+  "weekday_3": "Donnerstag",
+  "weekday_4": "Freitag",
+  "weekday_5": "Samstag",
+  "weekday_6": "Sonntag"
 }

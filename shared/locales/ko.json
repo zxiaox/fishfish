@@ -156,5 +156,16 @@
   "countdown_restart": "확인 시 카운트다운 다시 시작",
   "countdown_display": "카운트다운: {time}",
   "countdown_error": "00:00:01부터 999:59:59까지의 시간을 시:분:초 형식으로 입력하세요.",
-  "work_countdown_settings": "근무 및 카운트다운"
+  "work_countdown_settings": "근무 및 카운트다운",
+  "calendar_date": "{date} · {weekday}",
+  "calendar_lunar": "중국 음력: {year}년 {month}월 {day}일{leap}",
+  "calendar_leap": " (윤달)",
+  "calendar_lunar_unavailable": "중국 음력 날짜를 표시할 수 없습니다",
+  "weekday_0": "월요일",
+  "weekday_1": "화요일",
+  "weekday_2": "수요일",
+  "weekday_3": "목요일",
+  "weekday_4": "금요일",
+  "weekday_5": "토요일",
+  "weekday_6": "일요일"
 }

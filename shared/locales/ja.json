@@ -156,5 +156,16 @@
   "countdown_restart": "確認時にカウントダウンを再開",
   "countdown_display": "カウントダウン：{time}",
   "countdown_error": "00:00:01 から 999:59:59 までの時間を 時:分:秒 の形式で入力してください。",
-  "work_countdown_settings": "勤務とカウントダウン"
+  "work_countdown_settings": "勤務とカウントダウン",
+  "calendar_date": "{date} · {weekday}",
+  "calendar_lunar": "中国旧暦：{year}年{month}月{day}日{leap}",
+  "calendar_leap": "（閏月）",
+  "calendar_lunar_unavailable": "中国旧暦の日付を表示できません",
+  "weekday_0": "月曜日",
+  "weekday_1": "火曜日",
+  "weekday_2": "水曜日",
+  "weekday_3": "木曜日",
+  "weekday_4": "金曜日",
+  "weekday_5": "土曜日",
+  "weekday_6": "日曜日"
 }

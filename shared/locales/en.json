@@ -156,5 +156,16 @@
   "countdown_restart": "Restart countdown on confirmation",
   "countdown_display": "Countdown: {time}",
   "countdown_error": "Enter a duration from 00:00:01 to 999:59:59, using hours:minutes:seconds.",
-  "work_countdown_settings": "Work and countdown"
+  "work_countdown_settings": "Work and countdown",
+  "calendar_date": "{date} · {weekday}",
+  "calendar_lunar": "Chinese lunar: {year}-{month:02}-{day:02}{leap}",
+  "calendar_leap": " (leap month)",
+  "calendar_lunar_unavailable": "Chinese lunar date unavailable",
+  "weekday_0": "Monday",
+  "weekday_1": "Tuesday",
+  "weekday_2": "Wednesday",
+  "weekday_3": "Thursday",
+  "weekday_4": "Friday",
+  "weekday_5": "Saturday",
+  "weekday_6": "Sunday"
 }

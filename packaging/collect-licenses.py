@@ -3,7 +3,7 @@ from importlib import metadata
 from pathlib import Path
 
 output = []
-for name in ('cryptography', 'cffi', 'pycparser', 'pillow'):
+for name in ('cryptography', 'cffi', 'pycparser', 'pillow', 'lunar_python'):
     distribution = metadata.distribution(name)
     output.append(f'===== {name} {distribution.version} =====\n')
     paths = [item for item in distribution.files or [] if '.dist-info/' in str(item).replace('\\', '/') and 'license' in str(item).lower() and Path(item).name.lower().startswith(('license', 'copying'))]

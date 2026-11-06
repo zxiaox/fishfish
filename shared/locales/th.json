@@ -156,5 +156,16 @@
   "countdown_restart": "เริ่มนับถอยหลังใหม่เมื่อยืนยัน",
   "countdown_display": "นับถอยหลัง: {time}",
   "countdown_error": "ป้อนระยะเวลาตั้งแต่ 00:00:01 ถึง 999:59:59 ในรูปแบบ ชั่วโมง:นาที:วินาที",
-  "work_countdown_settings": "งานและนับถอยหลัง"
+  "work_countdown_settings": "งานและนับถอยหลัง",
+  "calendar_date": "{date} · {weekday}",
+  "calendar_lunar": "ปฏิทินจันทรคติจีน: {day}/{month}/{year}{leap}",
+  "calendar_leap": " (เดือนอธิกมาส)",
+  "calendar_lunar_unavailable": "ไม่สามารถแสดงวันที่จันทรคติจีน",
+  "weekday_0": "วันจันทร์",
+  "weekday_1": "วันอังคาร",
+  "weekday_2": "วันพุธ",
+  "weekday_3": "วันพฤหัสบดี",
+  "weekday_4": "วันศุกร์",
+  "weekday_5": "วันเสาร์",
+  "weekday_6": "วันอาทิตย์"
 }

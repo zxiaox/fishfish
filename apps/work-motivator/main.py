@@ -12,6 +12,7 @@ from shared.dialogs import center_window
 from shared.updater import check_updates, helper_mode, cleanup_mode
 from shared.core import work_status, work_interval, observed_work_by_day
 from countdown import DEFAULT_DURATION, parse_duration, new_deadline, remaining_text
+from calendar_display import calendar_lines
 
 APP = 'work-motivator'
 
@@ -26,19 +27,21 @@ class App:
         except ValueError: self.countdown_duration = DEFAULT_DURATION
         self.countdown_deadline = new_deadline(self.countdown_enabled, self.countdown_duration, self.countdown_enabled, self.countdown_duration, self.settings.get('countdown_deadline'), time.time())
         self.days = self.settings.get('worked_seconds', {}); self.last_wall = datetime.now(); self.last_mono = time.monotonic(); self.last_save = self.last_mono
-        self.remaining = tk.StringVar(); self.earned = tk.StringVar(); self.status = tk.StringVar(); self.rate = tk.StringVar(); self.month = tk.StringVar(); self.countdown = tk.StringVar()
+        self.remaining = tk.StringVar(); self.earned = tk.StringVar(); self.status = tk.StringVar(); self.rate = tk.StringVar(); self.month = tk.StringVar(); self.countdown = tk.StringVar(); self.calendar_date = tk.StringVar(); self.calendar_lunar = tk.StringVar(); self.calendar_cache = None
         set_app_icon(root, APP); self.build(); self.tick(); root.protocol('WM_DELETE_WINDOW', self.close)
         if not self.settings.get('configured'): root.after(100, self.open_settings)
 
     def build(self):
         for child in self.root.winfo_children(): child.destroy()
         apply_theme(self.root, self.theme); t = self.tr; self.root._fishfish_language = t.code
-        self.root.title(t('work_title')); self.root.geometry('560x440' if self.countdown_enabled else '560x380')
+        self.root.title(t('work_title')); self.root.geometry('560x490' if self.countdown_enabled else '560x430')
         top = ttk.Frame(self.root, padding=12); top.pack(fill='x')
         ttk.Label(top, text=t('work_title'), font=('', 16, 'bold')).pack(side='left')
         settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
                       lambda: check_updates(self.root, APP, self.tr), self.open_settings, t('work_countdown_settings'))
-        ttk.Label(self.root, textvariable=self.status, font=('', 13, 'bold')).pack(pady=(12, 5))
+        ttk.Label(self.root, textvariable=self.calendar_date, font=('', 11, 'bold')).pack(pady=(0, 2))
+        ttk.Label(self.root, textvariable=self.calendar_lunar, font=('', 10)).pack(pady=(0, 2))
+        ttk.Label(self.root, textvariable=self.status, font=('', 13, 'bold')).pack(pady=(8, 5))
         ttk.Label(self.root, textvariable=self.remaining, font=('', 15)).pack(pady=5)
         ttk.Label(self.root, textvariable=self.earned, style='Earnings.TLabel').pack(pady=8)
         ttk.Label(self.root, textvariable=self.rate, font=('', 12)).pack(pady=5)
@@ -77,13 +80,19 @@ class App:
         center_window(dialog, self.root)
 
     def set_language(self, code):
-        self.tr = Translator(code); self.save(); self.build()
+        self.tr = Translator(code); self.refresh_calendar(datetime.now().date()); self.save(); self.build()
 
     def set_theme(self, theme):
         self.theme = theme; self.save(); self.build()
 
+    def refresh_calendar(self, day):
+        key = (day, self.tr.code)
+        if key != self.calendar_cache:
+            date_text, lunar_text = calendar_lines(day, self.tr)
+            self.calendar_date.set(date_text); self.calendar_lunar.set(lunar_text); self.calendar_cache = key
+
     def tick(self):
-        now = datetime.now(); mono = time.monotonic()
+        now = datetime.now(); mono = time.monotonic(); self.refresh_calendar(now.date())
         try:
             remaining, earned, progress = work_status(now, self.start, self.end, self.wage)
             # Track observed time by calendar date, including across midnight.

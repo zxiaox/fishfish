@@ -1,5 +1,6 @@
 """Exercise Work Motivator's real settings and persisted countdown on Windows."""
 import importlib.util
+from datetime import date
 import os
 from pathlib import Path
 import sys
@@ -15,6 +16,15 @@ with tempfile.TemporaryDirectory() as directory:
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
     assert not app.countdown_enabled and app.countdown_duration == '05:00:00'
+    app.refresh_calendar(date(2024, 2, 10))
+    assert app.calendar_date.get() == '2024-02-10 · Saturday'
+    assert app.calendar_lunar.get() == 'Chinese lunar: 2024-01-01'
+    app.refresh_calendar(date(2025, 7, 25))
+    assert app.calendar_date.get() == '2025-07-25 · Friday'
+    assert '2025-06-01 (leap month)' in app.calendar_lunar.get()
+    app.set_language('zh'); app.refresh_calendar(date(2025, 7, 25))
+    assert '星期五' in app.calendar_date.get() and '闰月' in app.calendar_lunar.get()
+    app.set_language('en')
     app.open_settings()
     def descendants(widget):
         result = []
