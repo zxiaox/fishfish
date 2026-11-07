@@ -15,6 +15,8 @@ with tempfile.TemporaryDirectory() as directory:
     spec = importlib.util.spec_from_file_location('work_app', app_dir / 'main.py')
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
     root = tk.Tk(); app = module.App(root); root.update_idletasks()
+    assert root.title() == app.tr('work_title')
+    assert not any(isinstance(w, ttk.Label) and w.cget('text') == app.tr('work_title') for w in root.winfo_children())
     assert not app.countdown_enabled and app.countdown_duration == '05:00:00'
     app.refresh_calendar(date(2024, 2, 10))
     assert app.calendar_date.get() == '2024-02-10 · Saturday'
@@ -22,7 +24,9 @@ with tempfile.TemporaryDirectory() as directory:
     app.refresh_calendar(date(2025, 7, 25))
     assert app.calendar_date.get() == '2025-07-25 · Friday'
     assert '2025-06-01 (leap month)' in app.calendar_lunar.get()
-    app.set_language('zh'); app.refresh_calendar(date(2025, 7, 25))
+    app.set_language('zh'); app.tick(); app.refresh_calendar(date(2025, 7, 25))
+    assert app.earned.get().startswith('预计收入：') and app.earned.get().endswith(' 元')
+    assert app.rate.get().startswith('当前收入速率：') and app.rate.get().endswith(' 元/秒')
     assert '星期五' in app.calendar_date.get() and '闰月' in app.calendar_lunar.get()
     app.set_language('en')
     app.open_settings()

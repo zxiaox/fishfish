@@ -7,7 +7,7 @@ import urllib.request
 import webbrowser
 from pathlib import Path
 
-VERSIONS = {'work-motivator': '1.0.6', 'monty-hall': '1.0.15', 'war3-battle-platform': '1.0.9'}
+VERSIONS = {'work-motivator': '1.0.7', 'monty-hall': '1.0.15', 'war3-battle-platform': '1.0.9'}
 LANGUAGES = {'English': 'en', '简体中文': 'zh', '한국어': 'ko', '日本語': 'ja', 'ไทย': 'th', 'Deutsch': 'de', 'Español': 'es'}
 REPO = 'zxiaox/fishfish'
 

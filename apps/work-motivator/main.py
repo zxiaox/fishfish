@@ -35,8 +35,6 @@ class App:
         for child in self.root.winfo_children(): child.destroy()
         apply_theme(self.root, self.theme); t = self.tr; self.root._fishfish_language = t.code
         self.root.title(t('work_title')); self.root.geometry('560x490' if self.countdown_enabled else '560x430')
-        top = ttk.Frame(self.root, padding=12); top.pack(fill='x')
-        ttk.Label(top, text=t('work_title'), font=('', 16, 'bold')).pack(side='left')
         settings_menu(self.root, t, self.theme, self.set_language, self.set_theme,
                       lambda: check_updates(self.root, APP, self.tr), self.open_settings, t('work_countdown_settings'))
         ttk.Label(self.root, textvariable=self.calendar_date, font=('', 11, 'bold')).pack(pady=(0, 2))
